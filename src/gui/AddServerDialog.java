@@ -8,6 +8,8 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 import javax.swing.Box;
 import javax.swing.BorderFactory;
@@ -16,22 +18,46 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.JTextField;
 
+import parser.FileManager;
+
+import utils.Properties;
+
 
 public class AddServerDialog extends JDialog {
-
+	
+	 JPanel basic;
+	 
+     JTextField tfaddress;
+     JTextField tfalias;
+     JTextField tfcheckint;
+     JTextField tfcurrentstate;
+     JTextField tfemailnotif;
+     JTextField tfhostname;
+     JTextField tflastcheck;
+     JTextField tflastnotif;
+     JTextField tfmaxcheckattempts;
+     JTextField tfnotifinterval;
+     JTextField tfportslist;
+     JTextField tfretryint;
+     JTextField tftolerance;
+     
+     HashMap<Properties, String> data;
+     
 
     public AddServerDialog() {
-
+    	
+    	data = new HashMap<Properties, String>();	
         initUI();
     }
 
     public final void initUI() {
 
-        JPanel basic = new JPanel();
+        basic = new JPanel();
         basic.setLayout(new BoxLayout(basic, BoxLayout.Y_AXIS));
         add(basic);
 
@@ -58,32 +84,32 @@ public class AddServerDialog extends JDialog {
         PropPanel.setBorder(BorderFactory.createEmptyBorder(15, 25, 15, 25));
         
         JLabel laddress = new JLabel("Address:");
-        JTextField tfaddress = new JTextField("IP address",15);
+        tfaddress = new JTextField("IP address",15);
         JLabel lalias = new JLabel("Alias:");
-        JTextField tfalias = new JTextField("host alias",15);
+        tfalias = new JTextField("host alias",15);
         JLabel lcheckint = new JLabel("Check interval:");
-        JTextField tfcheckint = new JTextField("unit time between controls",15);
+        tfcheckint = new JTextField("unit time between controls",15);
         JLabel lcurrentstate = new JLabel("Current state:");
-        JTextField tfcurrentstate = new JTextField("service current state",15);
+        tfcurrentstate = new JTextField("service current state",15);
         JLabel lemailnotif = new JLabel("Email notification:");
-        JTextField tfemailnotif = new JTextField("email notification",15);
+        tfemailnotif = new JTextField("email notification",15);
         JLabel lhostname = new JLabel("Host name:");
-        JTextField tfhostname = new JTextField("hostname",15);
+        tfhostname = new JTextField("hostname",15);
         JLabel llastcheck = new JLabel("Last check:");
-        JTextField tflastcheck = new JTextField("last time check successfull",15);
+        tflastcheck = new JTextField("last time check successfull",15);
         JLabel llastnotif = new JLabel("Last notificacion:");
-        JTextField tflastnotif = new JTextField("last successfull notification",15);
+        tflastnotif = new JTextField("last successfull notification",15);
         JLabel lmaxcheckattempts = new JLabel("Max check attempts:");
-        JTextField tfmaxcheckattempts = new JTextField("number of times to retry check",15);
+        tfmaxcheckattempts = new JTextField("number of times to retry check",15);
         JLabel lnotifinterval = new JLabel("Notification interval:");
-        JTextField tfnotifinterval = new JTextField("how often send notif. failure",15);
+        tfnotifinterval = new JTextField("how often send notif. failure",15);
         JLabel lportslist = new JLabel("Ports list:");
-        JTextField tfportslist = new JTextField("Ports that will be verified",15);
+        tfportslist = new JTextField("Ports that will be verified",15);
         JLabel lretryint = new JLabel("Retry interval:");
-        JTextField tfretryint = new JTextField("minutes to wait before scheduling" +
+        tfretryint = new JTextField("minutes to wait before scheduling" +
         		" a new check",15);
         JLabel ltolerance = new JLabel("Tolerance attempts	:");
-        JTextField tftolerance = new JTextField(" times will wait before sending a " +
+        tftolerance = new JTextField("times will wait before sending a " +
         		"notice",15);
         
         PropPanel.add(laddress); PropPanel.add(tfaddress);
@@ -110,8 +136,37 @@ public class AddServerDialog extends JDialog {
         JButton close = new JButton("Close");
         close.setMnemonic(KeyEvent.VK_C);
         
+        save.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+            	data.put(Properties.ADDRESS,tfaddress.getText());
+            	data.put(Properties.ALIAS,tfalias.getText());
+            	data.put(Properties.CHECK_INTERVAL,tfcheckint.getText());
+            	data.put(Properties.CURRENT_STATE,tfcurrentstate.getText());
+            	data.put(Properties.EMAIL_NOTIF,tfemailnotif.getText());
+            	data.put(Properties.HOSTNAME,tfhostname.getText());
+            	data.put(Properties.LAST_CHECK,tflastcheck.getText());
+            	data.put(Properties.LAST_NOTIF,tflastnotif.getText());
+            	data.put(Properties.MAX_CHECK_ATTEMPTS,tfmaxcheckattempts.getText());
+            	data.put(Properties.NOTIF_INTERVAL,tfnotifinterval.getText());
+            	data.put(Properties.PORTS_LIST,tfportslist.getText());
+            	data.put(Properties.RETRY_INTERVAL,tfretryint.getText());
+            	data.put(Properties.TOLERANCE_ATTEMPTS,tftolerance.getText());
+            	FileManager fm = new FileManager(data);
+            	if(fm.save()){
+	            	JOptionPane.showMessageDialog(basic, "It has been created successfully!",
+	                        "Information", JOptionPane.INFORMATION_MESSAGE);
+	            	dispose();
+            	}
+            	else{
+            		 JOptionPane.showMessageDialog(basic, "File exists!",
+                             "Error", JOptionPane.ERROR_MESSAGE);
+            	}
+            }
+
+        });
+        
         close.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
+            public void actionPerformed(ActionEvent e) {
             	dispose();
             }
 
