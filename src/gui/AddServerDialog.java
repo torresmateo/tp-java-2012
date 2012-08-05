@@ -9,6 +9,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.util.HashMap;
+import java.util.Properties;
 
 import javax.swing.Box;
 import javax.swing.BorderFactory;
@@ -26,7 +27,7 @@ import javax.swing.JTextField;
 import parser.FileManager;
 import parser.Parser;
 
-import utils.Properties;
+import utils.ServerProperties;
 
 
 public class AddServerDialog extends JDialog{
@@ -47,14 +48,14 @@ public class AddServerDialog extends JDialog{
      JTextField tfretryint;
      JTextField tftolerance;
      //Hashmap para almacenar la información del formulario
-     HashMap<Properties, String> data;
+     HashMap<ServerProperties, String> data;
      //Variable para comunicar la creación de un nuevo archivo al frame padre
      boolean new_save;
 
     public AddServerDialog(JFrame father) {
     	//ventana modal
     	super(father,true);
-    	data = new HashMap<Properties, String>();
+    	data = new HashMap<ServerProperties, String>();
     	new_save=false;
         initUI();
         
@@ -141,19 +142,19 @@ public class AddServerDialog extends JDialog{
         
         save.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-            	data.put(Properties.ADDRESS,tfaddress.getText());
-            	data.put(Properties.ALIAS,tfalias.getText());
-            	data.put(Properties.CHECK_INTERVAL,tfcheckint.getText());
-            	data.put(Properties.CURRENT_STATE,tfcurrentstate.getText());
-            	data.put(Properties.EMAIL_NOTIF,tfemailnotif.getText());
-            	data.put(Properties.HOSTNAME,tfhostname.getText());
-            	data.put(Properties.LAST_CHECK,tflastcheck.getText());
-            	data.put(Properties.LAST_NOTIF,tflastnotif.getText());
-            	data.put(Properties.MAX_CHECK_ATTEMPTS,tfmaxcheckattempts.getText());
-            	data.put(Properties.NOTIF_INTERVAL,tfnotifinterval.getText());
-            	data.put(Properties.PORTS_LIST,tfportslist.getText());
-            	data.put(Properties.RETRY_INTERVAL,tfretryint.getText());
-            	data.put(Properties.TOLERANCE_ATTEMPTS,tftolerance.getText());            	
+            	data.put(ServerProperties.ADDRESS,tfaddress.getText());
+            	data.put(ServerProperties.ALIAS,tfalias.getText());
+            	data.put(ServerProperties.CHECK_INTERVAL,tfcheckint.getText());
+            	data.put(ServerProperties.CURRENT_STATE,tfcurrentstate.getText());
+            	data.put(ServerProperties.EMAIL_NOTIF,tfemailnotif.getText());
+            	data.put(ServerProperties.HOSTNAME,tfhostname.getText());
+            	data.put(ServerProperties.LAST_CHECK,tflastcheck.getText());
+            	data.put(ServerProperties.LAST_NOTIF,tflastnotif.getText());
+            	data.put(ServerProperties.MAX_CHECK_ATTEMPTS,tfmaxcheckattempts.getText());
+            	data.put(ServerProperties.NOTIF_INTERVAL,tfnotifinterval.getText());
+            	data.put(ServerProperties.PORTS_LIST,tfportslist.getText());
+            	data.put(ServerProperties.RETRY_INTERVAL,tfretryint.getText());
+            	data.put(ServerProperties.TOLERANCE_ATTEMPTS,tftolerance.getText());            	
             	FileManager fm = new FileManager(data);
             	if(fm.save(MainApp.DIR_PATH)){
 	            	JOptionPane.showMessageDialog(basic, "It has been created successfully!",
@@ -197,9 +198,9 @@ public class AddServerDialog extends JDialog{
      * Funciones para comunicación con ventana padre
      */
     
-    public java.util.Properties newServerProp(){
+    public Properties newServerProp(){
     	if(new_save){
-    		String server_file = MainApp.DIR_PATH+data.get(Properties.ALIAS)+".properties";	
+    		String server_file = MainApp.DIR_PATH+data.get(ServerProperties.ALIAS)+".properties";	
     		Parser p = new Parser(server_file);
 			return p.readProperties();
     	}
@@ -208,7 +209,7 @@ public class AddServerDialog extends JDialog{
     
     public String newServerName(){
     	if(new_save){
-    		String server_file = data.get(Properties.ALIAS)+".properties";	
+    		String server_file = data.get(ServerProperties.ALIAS)+".properties";	
     		return server_file;
     	}
     	return null;

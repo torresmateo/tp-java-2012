@@ -1,6 +1,6 @@
 package parser;
 
-import utils.Properties;
+import utils.ServerProperties;
 
 import java.io.File;
 import java.util.HashMap;
@@ -8,9 +8,9 @@ import java.util.HashMap;
 public class FileManager {
 
 	//Hashmap de la información del formulario
-    HashMap<Properties, String> data;
+    HashMap<ServerProperties, String> data;
 	
-	public FileManager(HashMap<Properties, String> data) {
+	public FileManager(HashMap<ServerProperties, String> data) {
 		this.data = data;
 	}
 	
@@ -20,7 +20,7 @@ public class FileManager {
 	
 	public boolean save(String DIR_PATH){
 		//El archivo a ser creado lleva el nombre de alias.properties
-		String server_file = DIR_PATH+data.get(Properties.ALIAS)+".properties";	
+		String server_file = DIR_PATH+data.get(ServerProperties.ALIAS)+".properties";	
 		File fichero = new File(server_file);
 
 		if (fichero.exists())
