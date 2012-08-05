@@ -23,10 +23,6 @@ public class Parser{
 		try {
 			is = new FileInputStream(this.file);
 			prop.load(is);
-		/*	for (Enumeration<Object> e = prop.keys(); e.hasMoreElements();) {
-				Object obj = e.nextElement();
-				System.out.println(obj + "="+ prop.getProperty(obj.toString()));
-			}*/
 		} catch (IOException ioException) {
 			ioException.printStackTrace();
 		}
