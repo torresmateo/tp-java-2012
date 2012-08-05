@@ -17,19 +17,20 @@ public class Parser{
 		this.file = file;
 	}
 	
-	public void readProperties(){
+	public Properties readProperties(){
 		InputStream is = null;
 		
 		try {
 			is = new FileInputStream(this.file);
 			prop.load(is);
-			for (Enumeration<Object> e = prop.keys(); e.hasMoreElements();) {
+		/*	for (Enumeration<Object> e = prop.keys(); e.hasMoreElements();) {
 				Object obj = e.nextElement();
 				System.out.println(obj + "="+ prop.getProperty(obj.toString()));
-			}
+			}*/
 		} catch (IOException ioException) {
 			ioException.printStackTrace();
 		}
+		return prop;
 	}
 	
 	public void writeProperties(HashMap<utils.Properties, String> data){

@@ -8,7 +8,6 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import javax.swing.Box;
@@ -17,6 +16,7 @@ import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -28,10 +28,10 @@ import parser.FileManager;
 import utils.Properties;
 
 
-public class AddServerDialog extends JDialog {
+public class AddServerDialog extends JDialog{
 	
-	 JPanel basic;
-	 
+	 JPanel basic;  //panel principal de la App
+	 //Campos del formulario
      JTextField tfaddress;
      JTextField tfalias;
      JTextField tfcheckint;
@@ -45,14 +45,18 @@ public class AddServerDialog extends JDialog {
      JTextField tfportslist;
      JTextField tfretryint;
      JTextField tftolerance;
-     
+     //Hashmap para almacenar la información del formulario
      HashMap<Properties, String> data;
-     
+     //Variable para comunicar la creación de un nuevo archivo al frame padre
+     boolean new_save;
 
-    public AddServerDialog() {
-    	
-    	data = new HashMap<Properties, String>();	
+    public AddServerDialog(JFrame father) {
+    	//ventana modal
+    	super(father,true);
+    	data = new HashMap<Properties, String>();
+    	new_save=false;
         initUI();
+        
     }
 
     public final void initUI() {
@@ -150,11 +154,12 @@ public class AddServerDialog extends JDialog {
             	data.put(Properties.NOTIF_INTERVAL,tfnotifinterval.getText());
             	data.put(Properties.PORTS_LIST,tfportslist.getText());
             	data.put(Properties.RETRY_INTERVAL,tfretryint.getText());
-            	data.put(Properties.TOLERANCE_ATTEMPTS,tftolerance.getText());
+            	data.put(Properties.TOLERANCE_ATTEMPTS,tftolerance.getText());            	
             	FileManager fm = new FileManager(data);
-            	if(fm.save()){
+            	if(fm.save(MainApp.DIR_PATH)){
 	            	JOptionPane.showMessageDialog(basic, "It has been created successfully!",
 	                        "Information", JOptionPane.INFORMATION_MESSAGE);
+	            	new_save=true;
 	            	dispose();
             	}
             	else{
@@ -162,11 +167,11 @@ public class AddServerDialog extends JDialog {
                              "Error", JOptionPane.ERROR_MESSAGE);
             	}
             }
-
         });
         
         close.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+            	new_save=false;
             	dispose();
             }
 
@@ -187,4 +192,9 @@ public class AddServerDialog extends JDialog {
         setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
     }
+    
+    public boolean newServerFile(){
+    	return new_save;
+    }
+    
 }
