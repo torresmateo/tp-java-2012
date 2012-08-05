@@ -22,7 +22,7 @@ import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.MutableTreeNode;
+
 
 import parser.Directory;
 import parser.Parser;
@@ -33,6 +33,11 @@ import parser.Parser;
 
 public class MainApp extends JFrame {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -408641277064642917L;
+
 	public static final String DIR_PATH="/home/samu/java_workspace/tp-java-2012/servers/";
 	
 	JPanel basic;         //panel principal de la App
@@ -151,7 +156,10 @@ public class MainApp extends JFrame {
 		for (int i = 0; i < servers_file.length; i++) {
 			Parser p = new Parser(servers_file[i].getAbsolutePath());
 			htTree.put(servers_file[i].getName(),propertiesToStringArray(p.readProperties()));
-		}
+			//TODO iniciar el hilo de monitor de este server
+			Properties prop = p.readProperties();
+			prop.get("address");
+		} 
 		
 		JTree.DynamicUtilTreeNode.createChildren(root, htTree);
 		tree = new JTree(model);
@@ -179,6 +187,9 @@ public class MainApp extends JFrame {
     	    propertiesToStringArray(dialog.newServerProp()));
     	 JTree.DynamicUtilTreeNode.createChildren(root,ht);
     	 ((DefaultTreeModel) tree.getModel()).reload();
+    	 
+    	 //TODO iniciar hilo de monitor para este server
+    	 // hay que pasarle las propiedades dialog.newServerProp()
     }
     
     /*

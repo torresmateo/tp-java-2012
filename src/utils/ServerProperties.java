@@ -1,6 +1,6 @@
 package utils;
 
-public enum Properties {
+public enum ServerProperties {
 	
 	ADDRESS, ALIAS, CHECK_INTERVAL, CURRENT_STATE,
     EMAIL_NOTIF, HOSTNAME, LAST_CHECK, LAST_NOTIF, 

@@ -29,24 +29,24 @@ public class Parser{
 		return prop;
 	}
 	
-	public void writeProperties(HashMap<utils.Properties, String> data){
+	public void writeProperties(HashMap<utils.ServerProperties, String> data){
 		
 		try {
 			OutputStream output = new FileOutputStream(this.file);
 
-			prop.put("address", data.get(utils.Properties.ADDRESS));
-			prop.put("alias", data.get(utils.Properties.ALIAS));
-			prop.put("check_interval", data.get(utils.Properties.CHECK_INTERVAL));
-			prop.put("current_state", data.get(utils.Properties.CURRENT_STATE));
-			prop.put("email_notification", data.get(utils.Properties.EMAIL_NOTIF));
-			prop.put("host_name", data.get(utils.Properties.HOSTNAME));
-			prop.put("last_check", data.get(utils.Properties.LAST_CHECK));
-			prop.put("last_notificacion", data.get(utils.Properties.LAST_NOTIF));
-			prop.put("max_check_attempts", data.get(utils.Properties.MAX_CHECK_ATTEMPTS));
-			prop.put("notification_interval", data.get(utils.Properties.NOTIF_INTERVAL));
-			prop.put("ports_list", data.get(utils.Properties.PORTS_LIST));
-			prop.put("retry_interval", data.get(utils.Properties.RETRY_INTERVAL));
-			prop.put("tolerance_attempts", data.get(utils.Properties.TOLERANCE_ATTEMPTS));
+			prop.put("address", data.get(utils.ServerProperties.ADDRESS));
+			prop.put("alias", data.get(utils.ServerProperties.ALIAS));
+			prop.put("check_interval", data.get(utils.ServerProperties.CHECK_INTERVAL));
+			prop.put("current_state", data.get(utils.ServerProperties.CURRENT_STATE));
+			prop.put("email_notification", data.get(utils.ServerProperties.EMAIL_NOTIF));
+			prop.put("host_name", data.get(utils.ServerProperties.HOSTNAME));
+			prop.put("last_check", data.get(utils.ServerProperties.LAST_CHECK));
+			prop.put("last_notificacion", data.get(utils.ServerProperties.LAST_NOTIF));
+			prop.put("max_check_attempts", data.get(utils.ServerProperties.MAX_CHECK_ATTEMPTS));
+			prop.put("notification_interval", data.get(utils.ServerProperties.NOTIF_INTERVAL));
+			prop.put("ports_list", data.get(utils.ServerProperties.PORTS_LIST));
+			prop.put("retry_interval", data.get(utils.ServerProperties.RETRY_INTERVAL));
+			prop.put("tolerance_attempts", data.get(utils.ServerProperties.TOLERANCE_ATTEMPTS));
 			
 			prop.store(output, "server properties");
 			

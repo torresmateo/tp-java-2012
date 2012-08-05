@@ -33,7 +33,6 @@ public class ConnectionChecker {
 					socket.close();
 				}catch(Exception e){//en caso en que el cierre de socket falle
 					e.printStackTrace();
-					returnValue = false;
 				}
 			}
 		}
