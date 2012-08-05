@@ -21,6 +21,8 @@ import javax.swing.JToolBar;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.MutableTreeNode;
 
 import parser.Directory;
 import parser.Parser;
@@ -37,7 +39,10 @@ public class MainApp extends JFrame {
 	JTabbedPane tabpanel; //panel de tabs de la App
 	JPanel serverPanel;   //panel del tab server
 	JPanel emailPanel;    //panel del tab email
+	
 	JTree tree;           //tree de los servers
+	DefaultMutableTreeNode root; //nodo raiz tree
+	DefaultTreeModel model; //modelo de datos del tree
 	
 	JToolBar toolbar;     //toolbar de la App
 	AddServerDialog dialog; //Ventana de dialogo 
@@ -66,14 +71,26 @@ public class MainApp extends JFrame {
         toolbar = new JToolBar();
         
         ImageIcon addIcon = new ImageIcon(getClass().getResource("add.png"));
-        ImageIcon exitIcon = new ImageIcon(getClass().getResource("exit.png"));
+        ImageIcon editIcon = new ImageIcon(getClass().getResource("edit.png"));
+        ImageIcon deleteIcon = new ImageIcon(getClass().getResource("delete.png"));
+        ImageIcon configIcon = new ImageIcon(getClass().getResource("config.png"));
+        ImageIcon exitIcon = new ImageIcon(getClass().getResource("exit2.png"));
         
         JButton addButton = new JButton(addIcon);
         addButton.setToolTipText("Add server configuration");
+        JButton editButton = new JButton(editIcon);
+        addButton.setToolTipText("Edit server configuration");
+        JButton deleteButton = new JButton(deleteIcon);
+        addButton.setToolTipText("Delete server configuration");
+        JButton configButton = new JButton(configIcon);
+        addButton.setToolTipText("Configure program parameters");
         JButton exitButton = new JButton(exitIcon);
-        exitButton.setToolTipText("Exit");
+        exitButton.setToolTipText("Exit from program");
              
         toolbar.add(addButton);
+        toolbar.add(editButton);
+        toolbar.add(deleteButton);
+        toolbar.add(configButton);
         toolbar.add(exitButton);
         toolbar.setFloatable(false);
 
@@ -85,9 +102,9 @@ public class MainApp extends JFrame {
                          dialog.setVisible(true);
                          //como es modal, al llegar aquí es porque se ha cerrado la
                          //ventana
-                         if(dialog.newServerFile()){         
+                         if(dialog.newServerProp()!=null){         
                         	 //cargar nuevo server file properties
-                        	 serverPanel = createServerPanel();
+                        	 addNewServerFileToTree();
                          }
                      }
                  });
@@ -121,7 +138,9 @@ public class MainApp extends JFrame {
     
     public JPanel createServerPanel() {
 		JPanel serverPanel = new JPanel(new BorderLayout());
-		DefaultMutableTreeNode root = new DefaultMutableTreeNode("Servers");
+		
+		root = new DefaultMutableTreeNode("Servers");
+		model = new DefaultTreeModel(root);
 		htTree = new Hashtable<String, Object>();
 		
 		// Listar los archivos de la carpeta de configuración
@@ -135,7 +154,7 @@ public class MainApp extends JFrame {
 		}
 		
 		JTree.DynamicUtilTreeNode.createChildren(root, htTree);
-		tree = new JTree(root);
+		tree = new JTree(model);
 
 	    JScrollPane scrollPane = new JScrollPane(tree);
 	    serverPanel.add(scrollPane, BorderLayout.CENTER);
@@ -152,6 +171,14 @@ public class MainApp extends JFrame {
 			StringProp[i++]=new String(obj +"="+ prop.getProperty(obj.toString()));
 		}
 		return StringProp;	
+    }
+    
+    public void addNewServerFileToTree(){
+    	 Hashtable<String, Object> ht = new Hashtable<String, Object>();
+    	 ht.put(dialog.newServerName(),
+    	    propertiesToStringArray(dialog.newServerProp()));
+    	 JTree.DynamicUtilTreeNode.createChildren(root,ht);
+    	 ((DefaultTreeModel) tree.getModel()).reload();
     }
     
     /*
