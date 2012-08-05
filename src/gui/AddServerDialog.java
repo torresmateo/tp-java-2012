@@ -24,6 +24,7 @@ import javax.swing.JSeparator;
 import javax.swing.JTextField;
 
 import parser.FileManager;
+import parser.Parser;
 
 import utils.Properties;
 
@@ -88,33 +89,31 @@ public class AddServerDialog extends JDialog{
         PropPanel.setBorder(BorderFactory.createEmptyBorder(15, 25, 15, 25));
         
         JLabel laddress = new JLabel("Address:");
-        tfaddress = new JTextField("IP address",15);
+        tfaddress = new JTextField("",15);
         JLabel lalias = new JLabel("Alias:");
-        tfalias = new JTextField("host alias",15);
+        tfalias = new JTextField("",15);
         JLabel lcheckint = new JLabel("Check interval:");
-        tfcheckint = new JTextField("unit time between controls",15);
+        tfcheckint = new JTextField("",15);
         JLabel lcurrentstate = new JLabel("Current state:");
-        tfcurrentstate = new JTextField("service current state",15);
+        tfcurrentstate = new JTextField("",15);
         JLabel lemailnotif = new JLabel("Email notification:");
-        tfemailnotif = new JTextField("email notification",15);
+        tfemailnotif = new JTextField("",15);
         JLabel lhostname = new JLabel("Host name:");
-        tfhostname = new JTextField("hostname",15);
+        tfhostname = new JTextField("",15);
         JLabel llastcheck = new JLabel("Last check:");
-        tflastcheck = new JTextField("last time check successfull",15);
+        tflastcheck = new JTextField("",15);
         JLabel llastnotif = new JLabel("Last notificacion:");
-        tflastnotif = new JTextField("last successfull notification",15);
+        tflastnotif = new JTextField("",15);
         JLabel lmaxcheckattempts = new JLabel("Max check attempts:");
-        tfmaxcheckattempts = new JTextField("number of times to retry check",15);
+        tfmaxcheckattempts = new JTextField("",15);
         JLabel lnotifinterval = new JLabel("Notification interval:");
-        tfnotifinterval = new JTextField("how often send notif. failure",15);
+        tfnotifinterval = new JTextField("",15);
         JLabel lportslist = new JLabel("Ports list:");
-        tfportslist = new JTextField("Ports that will be verified",15);
+        tfportslist = new JTextField("",15);
         JLabel lretryint = new JLabel("Retry interval:");
-        tfretryint = new JTextField("minutes to wait before scheduling" +
-        		" a new check",15);
+        tfretryint = new JTextField("",15);
         JLabel ltolerance = new JLabel("Tolerance attempts	:");
-        tftolerance = new JTextField("times will wait before sending a " +
-        		"notice",15);
+        tftolerance = new JTextField("",15);
         
         PropPanel.add(laddress); PropPanel.add(tfaddress);
         PropPanel.add(lalias);   PropPanel.add(tfalias);
@@ -193,8 +192,26 @@ public class AddServerDialog extends JDialog{
         setLocationRelativeTo(null);
     }
     
-    public boolean newServerFile(){
-    	return new_save;
+    
+    /*
+     * Funciones para comunicación con ventana padre
+     */
+    
+    public java.util.Properties newServerProp(){
+    	if(new_save){
+    		String server_file = MainApp.DIR_PATH+data.get(Properties.ALIAS)+".properties";	
+    		Parser p = new Parser(server_file);
+			return p.readProperties();
+    	}
+    	return null;
+    }
+    
+    public String newServerName(){
+    	if(new_save){
+    		String server_file = data.get(Properties.ALIAS)+".properties";	
+    		return server_file;
+    	}
+    	return null;
     }
     
 }
