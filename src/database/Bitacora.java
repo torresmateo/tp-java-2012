@@ -9,11 +9,11 @@ public class Bitacora {
 	private int ID;
 	private String alias;
 	private String direccionIP;
-	private String puerto;
+	private int puerto;
 	private String email;
 	private String estado;
 	
-	public Bitacora(int iD, String alias, String direccionIP, String puerto,
+	public Bitacora(int iD, String alias, String direccionIP, int puerto,
 			String email, String estado) {
 		super();
 		ID = iD;
@@ -24,7 +24,7 @@ public class Bitacora {
 		this.estado = estado;
 	}
 	
-	public Bitacora(String alias, String direccionIP, String puerto,
+	public Bitacora(String alias, String direccionIP, int puerto,
 			String email, String estado) {
 		super();
 		this.alias = alias;
@@ -52,10 +52,10 @@ public class Bitacora {
 	public void setDireccionIP(String direccionIP) {
 		this.direccionIP = direccionIP;
 	}
-	public String getPuerto() {
+	public int getPuerto() {
 		return puerto;
 	}
-	public void setPuerto(String puerto) {
+	public void setPuerto(int puerto) {
 		this.puerto = puerto;
 	}
 	public String getEmail() {
