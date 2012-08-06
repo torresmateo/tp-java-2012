@@ -40,7 +40,8 @@ public class MainApp extends JFrame {
 	 */
 	private static final long serialVersionUID = -408641277064642917L;
 
-	public static final String DIR_PATH="/Users/torresmateo/Documents/workspace/tp-java-2012/servers";
+	public static final String DIR_PATH="C:\\Users\\Fer Minardi\\Desktop\\servers\\";
+	//public static final String DIR_PATH="/Users/torresmateo/Documents/workspace/tp-java-2012/servers";
 	
 	JPanel basic;         //panel principal de la App
 	JTabbedPane tabpanel; //panel de tabs de la App
