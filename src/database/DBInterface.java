@@ -1,9 +1,11 @@
 package database;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Iterator;
 /**
@@ -42,7 +44,9 @@ public class DBInterface {
 				System.out.println(itr.next());
 			}
 			
+			Bitacora myBitacora = new Bitacora("arsis","ip de arsis",50,"torresmateo@gmail.com","a");
 			
+			db.insertBitacoraObj(myBitacora);
 			
 		} catch (ClassNotFoundException e) {
 			System.out.println("No se encontro el driver");
@@ -57,6 +61,10 @@ public class DBInterface {
 	//========================================================================
 	//						Bitacora
 	//========================================================================
+	
+	
+	//********************************** selectBitacora **********************************				
+	
 	//retorna un array de objetos
 	public ArrayList<Bitacora> selectBitacoraObj(String where) throws SQLException {
 		ArrayList<Bitacora> returnArray = new ArrayList<Bitacora>();
@@ -68,7 +76,7 @@ public class DBInterface {
 						rs.getInt("id_bitacora_servicios"),
 						rs.getString("alias"),
 						rs.getString("direccion_ip"),
-						rs.getString("puerto"),
+						rs.getInt("puerto"),
 						rs.getString("email"),
 						rs.getString("estado")
 					));
@@ -83,6 +91,9 @@ public class DBInterface {
 		return rs;
 	}
 	
+	//********************************** selectAllBitacora **********************************
+	
+	//retorna un array de objetos
 	public ArrayList<Bitacora> selectAllBitacoraObj() throws SQLException {
 		ArrayList<Bitacora> returnArray = new ArrayList<Bitacora>();
 		Statement stmt = conn.createStatement();
@@ -92,7 +103,7 @@ public class DBInterface {
 						rs.getInt("id_bitacora_servicios"),
 						rs.getString("alias"),
 						rs.getString("direccion_ip"),
-						rs.getString("puerto"),
+						rs.getInt("puerto"),
 						rs.getString("email"),
 						rs.getString("estado")
 					));
@@ -106,6 +117,21 @@ public class DBInterface {
 		return rs;
 	}
 	
+	
+	//********************************** insertBitacora **********************************
+	
+	public void insertBitacoraObj(Bitacora newEntry) throws SQLException {
+		String sql = "insert into bitacora_servicios (alias,direccion_ip,puerto,email,estado) values(?,?,?,?,?)";
+		PreparedStatement pstmt = conn.prepareStatement(sql);
+		pstmt.setString(1, newEntry.getAlias());
+		pstmt.setString(2, newEntry.getDireccionIP());
+		pstmt.setInt(3, newEntry.getPuerto());
+		pstmt.setString(4,newEntry.getEmail());
+		pstmt.setString(5,newEntry.getEstado());
+		pstmt.executeUpdate();
+	}
+	
+	//********************************** deleteBitacora **********************************
 	public void deleteBitacora(String where) throws SQLException{
 		//TODO esta funcion deberia de recibir un objeto que eliminar de la base de datos y aca 
 		//se debe preparar el sql con las propiedades de ese objeto entero.
