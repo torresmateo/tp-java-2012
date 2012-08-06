@@ -133,8 +133,6 @@ public class DBInterface {
 	
 	//********************************** deleteBitacora **********************************
 	public void deleteBitacora(String where) throws SQLException{
-		//TODO esta funcion deberia de recibir un objeto que eliminar de la base de datos y aca 
-		//se debe preparar el sql con las propiedades de ese objeto entero.
 		String sql = "delete from bitacora_servicios where " + where;
 		Statement stmt = conn.createStatement();
 		stmt.executeUpdate(sql);
@@ -144,8 +142,50 @@ public class DBInterface {
 	//========================================================================
 	//						Variables del Sistema
 	//========================================================================
-		
-	//TODO la misma onda, hacer que funcione con objetos
+	
+	//********************************** selectSysVarObjByName **********************************
+	
+	public ArrayList<SysVar> selectSysVarObjByName(String name) throws SQLException{
+		ArrayList<SysVar> returnArray = new ArrayList<SysVar>();
+		String sql = "select * from sys_vars where name=\"" + name + "\"";
+		Statement stmt = conn.createStatement();
+		ResultSet rs = stmt.executeQuery(sql);
+		while(rs.next()){
+			returnArray.add(new SysVar(
+						rs.getInt("id_sys_var"),
+						rs.getString("name"),
+						rs.getString("value")
+					));
+		}
+		return returnArray;
+	}
+	
+	//********************************** selectSysVarObj **********************************
+	
+	public ArrayList<SysVar> selectSysVarObj(String where) throws SQLException{
+		ArrayList<SysVar> returnArray = new ArrayList<SysVar>();
+		String sql = "select * from sys_vars where " + where;
+		Statement stmt = conn.createStatement();
+		ResultSet rs = stmt.executeQuery(sql);
+		while(rs.next()){
+			returnArray.add(new SysVar(
+						rs.getInt("id_sys_var"),
+						rs.getString("name"),
+						rs.getString("value")
+					));
+		}
+		return returnArray;
+	}
+	
+	//********************************** inertSysVarObj **********************************
+	
+	public void inertSysVarObj(SysVar newEntry) throws SQLException{
+		String sql = "insert into sys_vars (name,value) values(?,?)";
+		PreparedStatement pstmt = conn.prepareStatement(sql);
+		pstmt.setString(1, newEntry.getName());
+		pstmt.setString(2, newEntry.getValue());
+		pstmt.executeUpdate();
+	}
 	
 	public ResultSet selectSysVar(String where) throws SQLException{
 		String sql = "select * from sys_vars where " + where;
