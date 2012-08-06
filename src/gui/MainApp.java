@@ -23,6 +23,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
+import conncheck.ServerMonitor;
+
 
 import parser.Directory;
 import parser.Parser;
@@ -38,7 +40,7 @@ public class MainApp extends JFrame {
 	 */
 	private static final long serialVersionUID = -408641277064642917L;
 
-	public static final String DIR_PATH="/home/samu/java_workspace/tp-java-2012/servers/";
+	public static final String DIR_PATH="/Users/torresmateo/Documents/workspace/tp-java-2012/servers";
 	
 	JPanel basic;         //panel principal de la App
 	JTabbedPane tabpanel; //panel de tabs de la App
@@ -157,6 +159,8 @@ public class MainApp extends JFrame {
 			Parser p = new Parser(servers_file[i].getAbsolutePath());
 			htTree.put(servers_file[i].getName(),propertiesToStringArray(p.readProperties()));
 			//TODO iniciar el hilo de monitor de este server
+			ServerMonitor server = new ServerMonitor(p.readProperties());
+			server.start();
 			Properties prop = p.readProperties();
 			prop.get("address");
 		} 
