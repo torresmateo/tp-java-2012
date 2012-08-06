@@ -12,6 +12,38 @@ import java.sql.Statement;
 
 public class DBInterface {
 	Connection conn;
+	
+	public DBInterface(Connection conn){
+		this.conn = conn;
+	}
+	
+	public static void main(String[] args){
+		DBInterface db = null;
+		try{
+			Drivers.cargarDrivers();
+			Connection conPostgres = Conexiones.obtenerConexion(Conexiones.DBMS_TYPE_POSTGRES);
+			db = new DBInterface(conPostgres);
+		
+			ResultSet rs = db.selectAllBitacora();
+			while (rs.next()) {
+				System.out.println("Alias " + rs.getString("alias"));
+				System.out.println("IP " + rs.getString("direccion_ip"));
+				System.out.println("Port " + rs.getString("puerto"));
+				System.out.println("E-mail " + rs.getString("email"));
+				System.out.println("Status " + rs.getString("estado"));
+				
+				System.out.println("--- --- ---");
+			}
+		} catch (ClassNotFoundException e) {
+			System.out.println("No se encontro el driver");
+			e.printStackTrace();
+		} catch (SQLException e) {
+			System.out.println("No se pudo conectar" + e.getMessage());
+			e.printStackTrace();
+		}
+		
+		
+	}
 	//========================================================================
 	//						Bitacora
 	//========================================================================
@@ -55,5 +87,4 @@ public class DBInterface {
 		Statement stmt = conn.createStatement();
 		stmt.executeUpdate(sql);
 	}
-	
 }
