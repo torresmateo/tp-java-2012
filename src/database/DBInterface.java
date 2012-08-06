@@ -4,6 +4,8 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Iterator;
 /**
  * @author torresmateo
  * 
@@ -34,6 +36,14 @@ public class DBInterface {
 				
 				System.out.println("--- --- ---");
 			}
+			
+			Iterator<Bitacora> itr = db.selectAllBitacoraObj().iterator();
+			while(itr.hasNext()){
+				System.out.println(itr.next());
+			}
+			
+			
+			
 		} catch (ClassNotFoundException e) {
 			System.out.println("No se encontro el driver");
 			e.printStackTrace();
@@ -47,11 +57,47 @@ public class DBInterface {
 	//========================================================================
 	//						Bitacora
 	//========================================================================
+	//retorna un array de objetos
+	public ArrayList<Bitacora> selectBitacoraObj(String where) throws SQLException {
+		ArrayList<Bitacora> returnArray = new ArrayList<Bitacora>();
+		String sql = "select * from bitacora_servicios where " + where;
+		Statement stmt = conn.createStatement();
+		ResultSet rs = stmt.executeQuery(sql);
+		while(rs.next()){
+			returnArray.add(new Bitacora(
+						rs.getInt("id_bitacora_servicios"),
+						rs.getString("alias"),
+						rs.getString("direccion_ip"),
+						rs.getString("puerto"),
+						rs.getString("email"),
+						rs.getString("estado")
+					));
+		}
+		return returnArray;
+	}
+	
 	public ResultSet selectBitacora(String where) throws SQLException {
 		String sql = "select * from bitacora_servicios where " + where;
 		Statement stmt = conn.createStatement();
 		ResultSet rs = stmt.executeQuery(sql);
 		return rs;
+	}
+	
+	public ArrayList<Bitacora> selectAllBitacoraObj() throws SQLException {
+		ArrayList<Bitacora> returnArray = new ArrayList<Bitacora>();
+		Statement stmt = conn.createStatement();
+		ResultSet rs = stmt.executeQuery("select * from bitacora_servicios");
+		while(rs.next()){
+			returnArray.add(new Bitacora(
+						rs.getInt("id_bitacora_servicios"),
+						rs.getString("alias"),
+						rs.getString("direccion_ip"),
+						rs.getString("puerto"),
+						rs.getString("email"),
+						rs.getString("estado")
+					));
+		}
+		return returnArray;
 	}
 	
 	public ResultSet selectAllBitacora() throws SQLException {
