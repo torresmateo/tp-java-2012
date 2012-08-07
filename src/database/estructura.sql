@@ -1,4 +1,4 @@
---
+ï»¿--
 -- PostgreSQL database dump
 --
 
@@ -64,7 +64,7 @@ COMMENT ON COLUMN bitacora_servicios.alias IS 'El alias para identificar en form
 -- Name: COLUMN bitacora_servicios.direccion_ip; Type: COMMENT; Schema: public; Owner: -
 --
 
-COMMENT ON COLUMN bitacora_servicios.direccion_ip IS 'La direcci—n IP del servicio monitoreado. Soporta hasta direcciones IPv6';
+COMMENT ON COLUMN bitacora_servicios.direccion_ip IS 'La direcciâ€”n IP del servicio monitoreado. Soporta hasta direcciones IPv6';
 
 
 --
@@ -82,7 +82,7 @@ COMMENT ON COLUMN bitacora_servicios.puerto IS 'El puerto TCP del servicio monit
 -- Name: COLUMN bitacora_servicios.email; Type: COMMENT; Schema: public; Owner: -
 --
 
-COMMENT ON COLUMN bitacora_servicios.email IS 'El correo electr—nico del destinatario responsable de este servicio.';
+COMMENT ON COLUMN bitacora_servicios.email IS 'El correo electrâ€”nico del destinatario responsable de este servicio.';
 
 
 --
@@ -91,7 +91,7 @@ COMMENT ON COLUMN bitacora_servicios.email IS 'El correo electr—nico del destina
 -- Name: COLUMN bitacora_servicios.estado; Type: COMMENT; Schema: public; Owner: -
 --
 
-COMMENT ON COLUMN bitacora_servicios.estado IS 'El estado del servicio en el momento de la revisi—n. ';
+COMMENT ON COLUMN bitacora_servicios.estado IS 'El estado del servicio en el momento de la revisiâ€”n. ';
 
 
 --
@@ -100,7 +100,7 @@ COMMENT ON COLUMN bitacora_servicios.estado IS 'El estado del servicio en el mom
 -- Name: COLUMN bitacora_servicios.marca_tiempo; Type: COMMENT; Schema: public; Owner: -
 --
 
-COMMENT ON COLUMN bitacora_servicios.marca_tiempo IS 'La fecha correspondiente a esta revisi—n.';
+COMMENT ON COLUMN bitacora_servicios.marca_tiempo IS 'La fecha correspondiente a esta revisiâ€”n.';
 
 
 --

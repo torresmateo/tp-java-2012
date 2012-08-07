@@ -12,9 +12,10 @@ public class Bitacora {
 	private String puerto;
 	private String email;
 	private String estado;
+	private String marcaTiempo;
 	
 	public Bitacora(int iD, String alias, String direccionIP, String puerto,
-			String email, String estado) {
+			String email, String estado, String marcaTiempo) {
 		super();
 		ID = iD;
 		this.alias = alias;
@@ -22,16 +23,18 @@ public class Bitacora {
 		this.puerto = puerto;
 		this.email = email;
 		this.estado = estado;
+		this.marcaTiempo = marcaTiempo;
 	}
 	
 	public Bitacora(String alias, String direccionIP, String puerto,
-			String email, String estado) {
+			String email, String estado, String marcaTiempo) {
 		super();
 		this.alias = alias;
 		this.direccionIP = direccionIP;
 		this.puerto = puerto;
 		this.email = email;
 		this.estado = estado;
+		this.marcaTiempo = marcaTiempo;
 	}
 
 	public int getID() {
@@ -70,12 +73,18 @@ public class Bitacora {
 	public void setEstado(String estado) {
 		this.estado = estado;
 	}
+	public String getMarcaTiempo() {
+		return marcaTiempo;
+	}
+	public void setMarcaTiempo(String marcaTiempo) {
+		this.marcaTiempo = marcaTiempo;
+	}
 
 	@Override
 	public String toString() {
 		return "Bitacora [ID=" + ID + ", alias=" + alias + ", direccionIP="
 				+ direccionIP + ", puerto=" + puerto + ", email=" + email
-				+ ", estado=" + estado + "]";
+				+ ", estado=" + estado + ", marcaTiempo=" + marcaTiempo + "]";
 	}
 	
 	

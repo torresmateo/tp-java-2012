@@ -24,8 +24,9 @@ public class Conexiones {
 	 * La ruta hasta el archivo .properties que contiene los datos para
 	 * conectarnos a la Base de Datos
 	 */
-	private static final String POSTGRES_PROPERTIES_PATH = "/Users/torresmateo/Documents/workspace/tp-java-2012/src/postgres.properties";
-
+	//private static final String POSTGRES_PROPERTIES_PATH = "/Users/torresmateo/Documents/workspace/tp-java-2012/src/postgres.properties";
+	private static final String POSTGRES_PROPERTIES_PATH = "C://eclipse//workspace//tp-java-2012//src//postgres.properties";
+	
 	public static void main(String[] args) {
 		try {
 			/* Se inicializan los controladores necesarios */
