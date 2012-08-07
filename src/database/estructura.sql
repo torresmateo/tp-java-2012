@@ -1,153 +1,75 @@
---
--- PostgreSQL database dump
---
+/*
+ Navicat Premium Data Transfer
 
--- Dumped from database version 8.4.9
--- Dumped by pg_dump version 9.1.4
--- Started on 2012-07-31 14:35:15 PYT
+ Source Server         : LocalHost
+ Source Server Type    : PostgreSQL
+ Source Server Version : 90104
+ Source Host           : localhost
+ Source Database       : tpjava
+ Source Schema         : public
 
-SET statement_timeout = 0;
-SET client_encoding = 'UTF8';
-SET standard_conforming_strings = off;
-SET check_function_bodies = false;
-SET client_min_messages = warning;
-SET escape_string_warning = off;
+ Target Server Type    : PostgreSQL
+ Target Server Version : 90104
+ File Encoding         : utf-8
 
---
--- TOC entry 1778 (class 1262 OID 24720)
--- Name: tpjava; Type: DATABASE; Schema: -; Owner: -
---
+ Date: 08/06/2012 19:22:57 PM
+*/
 
+-- ----------------------------
+--  Sequence structure for "bitacora_servicios_id_bitacora_servicios_seq"
+-- ----------------------------
+DROP SEQUENCE IF EXISTS "bitacora_servicios_id_bitacora_servicios_seq";
+CREATE SEQUENCE "bitacora_servicios_id_bitacora_servicios_seq" INCREMENT 1 START 1 MAXVALUE 9223372036854775807 MINVALUE 1 CACHE 1;
+ALTER TABLE "bitacora_servicios_id_bitacora_servicios_seq" OWNER TO "postgres";
 
+-- ----------------------------
+--  Sequence structure for "sys_vars_id_sys_vars_seq"
+-- ----------------------------
+DROP SEQUENCE IF EXISTS "sys_vars_id_sys_vars_seq";
+CREATE SEQUENCE "sys_vars_id_sys_vars_seq" INCREMENT 1 START 1 MAXVALUE 9223372036854775807 MINVALUE 1 CACHE 1;
+ALTER TABLE "sys_vars_id_sys_vars_seq" OWNER TO "postgres";
 
+-- ----------------------------
+--  Table structure for "sys_vars"
+-- ----------------------------
+DROP TABLE IF EXISTS "sys_vars";
+CREATE TABLE "sys_vars" (
+	"id_sys_vars" int8 NOT NULL,
+	"name" varchar NOT NULL,
+	"value" varchar NOT NULL
+)
+WITH (OIDS=FALSE);
+ALTER TABLE "sys_vars" OWNER TO "postgres";
 
-SET statement_timeout = 0;
-SET client_encoding = 'UTF8';
-SET standard_conforming_strings = off;
-SET check_function_bodies = false;
-SET client_min_messages = warning;
-SET escape_string_warning = off;
-
-SET search_path = public, pg_catalog;
-
-SET default_with_oids = false;
-
---
--- TOC entry 141 (class 1259 OID 24723)
--- Dependencies: 1772 1773 3
--- Name: bitacora_servicios; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE bitacora_servicios (
-    id_bitacora_servicios bigint NOT NULL,
-    alias character varying(30),
-    direccion_ip character varying(40) NOT NULL,
-    puerto integer NOT NULL,
-    email character varying(250) NOT NULL,
-    estado character varying(10) DEFAULT 'N/A'::character varying,
-    marca_tiempo timestamp without time zone DEFAULT now()
-);
-
-
---
--- TOC entry 1780 (class 0 OID 0)
--- Dependencies: 141
--- Name: COLUMN bitacora_servicios.alias; Type: COMMENT; Schema: public; Owner: -
---
-
-COMMENT ON COLUMN bitacora_servicios.alias IS 'El alias para identificar en forma de string al host o nro. de IP que tiene el servicio a ser monitoreado. ';
-
-
---
--- TOC entry 1781 (class 0 OID 0)
--- Dependencies: 141
--- Name: COLUMN bitacora_servicios.direccion_ip; Type: COMMENT; Schema: public; Owner: -
---
-
-COMMENT ON COLUMN bitacora_servicios.direccion_ip IS 'La direcci—n IP del servicio monitoreado. Soporta hasta direcciones IPv6';
+-- ----------------------------
+--  Table structure for "bitacora_servicios"
+-- ----------------------------
+DROP TABLE IF EXISTS "bitacora_servicios";
+CREATE TABLE "bitacora_servicios" (
+	"id_bitacora_servicios" int8 NOT NULL DEFAULT nextval('bitacora_servicios_id_bitacora_servicios_seq'::regclass),
+	"alias" varchar(30),
+	"direccion_ip" varchar(40) NOT NULL,
+	"puerto" int4 NOT NULL,
+	"email" varchar(250) NOT NULL,
+	"estado" varchar(10) DEFAULT 'N/A'::character varying,
+	"marca_tiempo" timestamp(6) NULL DEFAULT now()
+)
+WITH (OIDS=FALSE);
+ALTER TABLE "bitacora_servicios" OWNER TO "postgres";
 
 
---
--- TOC entry 1782 (class 0 OID 0)
--- Dependencies: 141
--- Name: COLUMN bitacora_servicios.puerto; Type: COMMENT; Schema: public; Owner: -
---
+-- ----------------------------
+--  Alter sequences owned by
+-- ----------------------------
+ALTER SEQUENCE "bitacora_servicios_id_bitacora_servicios_seq" OWNED BY "bitacora_servicios"."id_bitacora_servicios";
+ALTER SEQUENCE "sys_vars_id_sys_vars_seq" OWNED BY "sys_vars"."id_sys_vars";
+-- ----------------------------
+--  Primary key structure for table "sys_vars"
+-- ----------------------------
+ALTER TABLE "sys_vars" ADD CONSTRAINT "sys_vars_pkey" PRIMARY KEY ("id_sys_vars") NOT DEFERRABLE INITIALLY IMMEDIATE;
 
-COMMENT ON COLUMN bitacora_servicios.puerto IS 'El puerto TCP del servicio monitoreado.';
-
-
---
--- TOC entry 1783 (class 0 OID 0)
--- Dependencies: 141
--- Name: COLUMN bitacora_servicios.email; Type: COMMENT; Schema: public; Owner: -
---
-
-COMMENT ON COLUMN bitacora_servicios.email IS 'El correo electr—nico del destinatario responsable de este servicio.';
-
-
---
--- TOC entry 1784 (class 0 OID 0)
--- Dependencies: 141
--- Name: COLUMN bitacora_servicios.estado; Type: COMMENT; Schema: public; Owner: -
---
-
-COMMENT ON COLUMN bitacora_servicios.estado IS 'El estado del servicio en el momento de la revisi—n. ';
-
-
---
--- TOC entry 1785 (class 0 OID 0)
--- Dependencies: 141
--- Name: COLUMN bitacora_servicios.marca_tiempo; Type: COMMENT; Schema: public; Owner: -
---
-
-COMMENT ON COLUMN bitacora_servicios.marca_tiempo IS 'La fecha correspondiente a esta revisi—n.';
-
-
---
--- TOC entry 140 (class 1259 OID 24721)
--- Dependencies: 3 141
--- Name: bitacora_servicios_id_bitacora_servicios_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE bitacora_servicios_id_bitacora_servicios_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- TOC entry 1786 (class 0 OID 0)
--- Dependencies: 140
--- Name: bitacora_servicios_id_bitacora_servicios_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE bitacora_servicios_id_bitacora_servicios_seq OWNED BY bitacora_servicios.id_bitacora_servicios;
-
-
---
--- TOC entry 1771 (class 2604 OID 24726)
--- Dependencies: 141 140 141
--- Name: id_bitacora_servicios; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY bitacora_servicios ALTER COLUMN id_bitacora_servicios SET DEFAULT nextval('bitacora_servicios_id_bitacora_servicios_seq'::regclass);
-
-
---
--- TOC entry 1775 (class 2606 OID 24728)
--- Dependencies: 141 141
--- Name: pk_bitacora_servicios; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY bitacora_servicios
-    ADD CONSTRAINT pk_bitacora_servicios PRIMARY KEY (id_bitacora_servicios);
-
-
--- Completed on 2012-07-31 14:35:16 PYT
-
---
--- PostgreSQL database dump complete
---
+-- ----------------------------
+--  Primary key structure for table "bitacora_servicios"
+-- ----------------------------
+ALTER TABLE "bitacora_servicios" ADD CONSTRAINT "pk_bitacora_servicios" PRIMARY KEY ("id_bitacora_servicios") NOT DEFERRABLE INITIALLY IMMEDIATE;
 
