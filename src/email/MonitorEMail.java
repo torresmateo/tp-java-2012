@@ -20,7 +20,7 @@ public class MonitorEMail {
 		// Nombre del host de correo
 		props.setProperty("mail.smtp.host", "smtp.gmail.com");
 	
-		// TLS si está disponible
+		// TLS si estï¿½ disponible
 		props.setProperty("mail.smtp.starttls.enable", "true");
 	
 		// Puerto de gmail para envio de correos
@@ -75,7 +75,7 @@ public class MonitorEMail {
 		}
 	}
 	
-	// Añadir destinatarios
+	// Aï¿½adir destinatarios
 	void addRecipient(String recipient){
 		try{
 			message.addRecipient(Message.RecipientType.TO, new InternetAddress(recipient));
