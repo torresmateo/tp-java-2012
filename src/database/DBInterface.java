@@ -180,7 +180,7 @@ public class DBInterface {
 	
 	//********************************** inertSysVarObj **********************************
 	
-	public void inertSysVarObj(SysVar newEntry) throws SQLException{
+	public void insertSysVarObj(SysVar newEntry) throws SQLException{
 		String sql = "insert into sys_vars (name,value) values(?,?)";
 		PreparedStatement pstmt = conn.prepareStatement(sql);
 		pstmt.setString(1, newEntry.getName());

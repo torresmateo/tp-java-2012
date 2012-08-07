@@ -1,8 +1,11 @@
 package parser;
 
+import gui.MainApp;
+
 import java.io.*;
 import java.util.*;
 
+import utils.DefaultConfig;
 import utils.ServerProperties;
 
 public class Parser{
@@ -51,6 +54,23 @@ public class Parser{
 			prop.put("tolerance_attempts", data.get(ServerProperties.TOLERANCE_ATTEMPTS));
 			
 			prop.store(output, "server properties");
+			
+		} catch (IOException ioException) {
+			ioException.printStackTrace();
+		}
+	}
+	
+	public static void writeConfiguration(Hashtable<String, String> info){
+		Properties prop = new Properties();
+		try {
+			OutputStream output = new FileOutputStream(MainApp.POSTGRES_PROPERTIES_PATH);
+
+			prop.put("Driver", info.get("Driver"));
+			prop.put("Url", info.get("Url"));
+			prop.put("UserName", info.get("UserName"));
+			prop.put("Password", info.get("Password"));
+			
+			prop.store(output, "App configuration");
 			
 		} catch (IOException ioException) {
 			ioException.printStackTrace();
