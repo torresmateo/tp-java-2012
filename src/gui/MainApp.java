@@ -5,8 +5,12 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.Properties;
 
 import javax.swing.ImageIcon;
@@ -17,13 +21,19 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
+import javax.swing.JTable;
 import javax.swing.JToolBar;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
+
 import conncheck.ServerMonitor;
+import database.Bitacora;
+import database.Conexiones;
+import database.DBInterface;
+import database.Drivers;
 
 
 import parser.Directory;
@@ -47,6 +57,7 @@ public class MainApp extends JFrame {
 	JTabbedPane tabpanel; //panel de tabs de la App
 	JPanel serverPanel;   //panel del tab server
 	JPanel emailPanel;    //panel del tab email
+	JTable emailTable;    //tabla con emails de alerta
 	
 	JTree tree;           //tree de los servers
 	DefaultMutableTreeNode root; //nodo raiz tree
@@ -203,12 +214,31 @@ public class MainApp extends JFrame {
     
     public JPanel createEmailPanel(String text) {
 		JPanel emailPanel = new JPanel();
-		JLabel jlbDisplay = new JLabel(text);
-		jlbDisplay.setHorizontalAlignment(JLabel.CENTER);
-		emailPanel.setLayout(new GridLayout(1, 1));
-		emailPanel.add(jlbDisplay);
+		
+		DBInterface db = null;
+		try{
+			Drivers.cargarDrivers();
+			Connection conPostgres = Conexiones.obtenerConexion(Conexiones.DBMS_TYPE_POSTGRES);
+			db = new DBInterface(conPostgres);
+			emailTable = new JTable(new AlertsTableModel(db.selectAllBitacoraObj()));
+		} catch (ClassNotFoundException e) {
+			System.out.println("No se encontro el driver");
+			e.printStackTrace();
+		} catch (SQLException e) {
+			System.out.println("No se pudo conectar" + e.getMessage());
+			e.printStackTrace();
+		}
+		
+		
+		//new JTable
+		//System.out.println(db.selectAllBitacoraObj());
+		JScrollPane scrollPane = new JScrollPane(emailTable);
+		emailPanel.add(scrollPane);
+		
 		return emailPanel;
 	}
+    
+    
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(new Runnable() {

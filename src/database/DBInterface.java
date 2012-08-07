@@ -70,7 +70,8 @@ public class DBInterface {
 						rs.getString("direccion_ip"),
 						rs.getString("puerto"),
 						rs.getString("email"),
-						rs.getString("estado")
+						rs.getString("estado"),
+						rs.getString("marca_tiempo")
 					));
 		}
 		return returnArray;
@@ -94,7 +95,8 @@ public class DBInterface {
 						rs.getString("direccion_ip"),
 						rs.getString("puerto"),
 						rs.getString("email"),
-						rs.getString("estado")
+						rs.getString("estado"),
+						rs.getString("marca_tiempo")
 					));
 		}
 		return returnArray;
