@@ -20,7 +20,7 @@ public class FileManager {
 		if (exists(server_file))
 			return false;
 		else{
-			Parser p = new Parser(MainApp.DIR_PATH+server_file);
+			Parser p = new Parser(MainApp.getDIR_PATH()+server_file);
 			p.writeProperties(data);
 			return true;
 		}
@@ -47,7 +47,7 @@ public class FileManager {
 	 */
 	
 	public static boolean remove(String fileName){
-		File fichero = new File(MainApp.DIR_PATH+fileName);
+		File fichero = new File(MainApp.getDIR_PATH()+fileName);
 		return fichero.delete();
 	}
 	
@@ -56,7 +56,7 @@ public class FileManager {
 	 */
 	
 	public static boolean exists(String fileName){
-		File fichero = new File(MainApp.DIR_PATH+fileName);
+		File fichero = new File(MainApp.getDIR_PATH()+fileName);
 		if (fichero.exists())
 			return true;
 		else
