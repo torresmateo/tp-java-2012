@@ -3,6 +3,7 @@ package database;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Hashtable;
 import java.util.Properties;
 
 import parser.Parser;
@@ -19,7 +20,7 @@ public class Conector {
 	 * @throws ClassNotFoundException
 	 * 
 	 */
-	public static Connection conectar(String file) throws SQLException,
+	public static Connection connectByFile(String file) throws SQLException,
 			ClassNotFoundException {
 
 		Parser p = new Parser(file);
@@ -36,5 +37,20 @@ public class Conector {
 
 		return con;
 	}
+	
+	public static Connection connectByHash(Hashtable<String, String> info) throws SQLException,
+	ClassNotFoundException {
+		
+		String driverName = info.get("Driver");
+		String url = info.get("Url");
+		String userName = info.get("UserName");
+		String pass = info.get("Password");
+		
+		Class.forName(driverName);
+		
+		Connection con = DriverManager.getConnection(url, userName, pass);
+		
+		return con;
+}
 
 }
