@@ -23,7 +23,7 @@ public class PruebasBD {
 			// Conexiones.obtenerConexion(Conexiones.DBMS_TYPE_ORACLE);
 			conPostgres = Conexiones
 					.obtenerConexion(Conexiones.DBMS_TYPE_POSTGRES);
-			 pruebaSelect(conPostgres);
+			pruebaSelect(conPostgres);
 //			pruebaUpdate(conPostgres);
 			//pruebaDelete(conPostgres);
 
