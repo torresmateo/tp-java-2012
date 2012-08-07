@@ -5,8 +5,13 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.Properties;
 
 import javax.swing.ImageIcon;
@@ -28,6 +33,11 @@ import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeSelectionModel;
 
 import conncheck.ServerMonitor;
+import database.Bitacora;
+import database.Conexiones;
+import database.DBInterface;
+import database.Drivers;
+import database.SysVar;
 
 
 import parser.Directory;
@@ -42,7 +52,8 @@ public class MainApp extends JFrame {
 	
 	private static final long serialVersionUID = -408641277064642917L;
 
-	public static final String DIR_PATH="/home/samu/java_workspace/tp-java-2012/servers/";
+	//public static final String DIR_PATH="/home/samu/java_workspace/tp-java-2012/servers/";
+	private static String DIR_PATH;
 	
 	JPanel basic;         //panel principal de la App
 	JTabbedPane tabpanel; //panel de tabs de la App
@@ -63,7 +74,33 @@ public class MainApp extends JFrame {
 	EditServerDialog EditDialog; //Ventana de dialogo de edit
 	
 
-    public MainApp() {
+    public static String getDIR_PATH() {
+		return DIR_PATH;
+	}
+
+
+	public MainApp() {
+    	
+    	DBInterface db = null;
+    	try{
+    		Drivers.cargarDrivers();
+    		Connection conPostgres = Conexiones.obtenerConexion(Conexiones.DBMS_TYPE_POSTGRES);
+    		db = new DBInterface(conPostgres);
+    		ArrayList<SysVar>sv = db.selectSysVarObjByName("DIR_PATH");
+    		if(!sv.isEmpty())
+    			MainApp.DIR_PATH = sv.get(0).getValue();
+    		else{
+    			System.err.println("No se encontro la variable DIR_PATH en la base de datos");
+    			System.exit(ABORT);
+    		}
+    	} catch (ClassNotFoundException e) {
+    		System.out.println("No se encontro el driver");
+    		e.printStackTrace();
+    	} catch (SQLException e) {
+    		System.out.println("No se pudo conectar" + e.getMessage());
+    		e.printStackTrace();
+    	}
+    	
     	AddDialog = new AddServerDialog(this); //dialogo modal
     	EditDialog = new EditServerDialog(this); //dialogo modal
     	serverData = new Hashtable<String, Properties>();

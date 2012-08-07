@@ -164,7 +164,7 @@ public class ServerDialog extends JDialog{
     
     public Properties newServerProp(){
     	if(new_save){
-    		String server_file = MainApp.DIR_PATH+data.get(ServerProperties.ALIAS)
+    		String server_file = MainApp.getDIR_PATH() + data.get(ServerProperties.ALIAS)
     				+".properties";	
     		Parser p = new Parser(server_file);
 			return p.readProperties();

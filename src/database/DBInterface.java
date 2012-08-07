@@ -147,12 +147,12 @@ public class DBInterface {
 	
 	public ArrayList<SysVar> selectSysVarObjByName(String name) throws SQLException{
 		ArrayList<SysVar> returnArray = new ArrayList<SysVar>();
-		String sql = "select * from sys_vars where name=\"" + name + "\"";
+		String sql = "select * from sys_vars where name = \'" + name + "\'";
 		Statement stmt = conn.createStatement();
 		ResultSet rs = stmt.executeQuery(sql);
 		while(rs.next()){
 			returnArray.add(new SysVar(
-						rs.getInt("id_sys_var"),
+						rs.getInt("id_sys_vars"),
 						rs.getString("name"),
 						rs.getString("value")
 					));
