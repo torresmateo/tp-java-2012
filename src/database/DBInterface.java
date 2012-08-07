@@ -44,9 +44,9 @@ public class DBInterface {
 				System.out.println(itr.next());
 			}
 			
-			Bitacora myBitacora = new Bitacora("arsis","ip de arsis",50,"torresmateo@gmail.com","a");
+			//Bitacora myBitacora = new Bitacora("arsis","ip de arsis",50,"torresmateo@gmail.com","a","2012-08-06 19:45:51");
 			
-			db.insertBitacoraObj(myBitacora);
+			//db.insertBitacoraObj(myBitacora);
 			
 		} catch (ClassNotFoundException e) {
 			System.out.println("No se encontro el driver");
