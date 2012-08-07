@@ -1,23 +1,19 @@
 package gui;
 
 import java.awt.BorderLayout;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.Properties;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -34,10 +30,8 @@ import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeSelectionModel;
 
 import conncheck.ServerMonitor;
-import database.Bitacora;
-import database.Conexiones;
+import database.Conector;
 import database.DBInterface;
-import database.Drivers;
 import database.SysVar;
 
 
@@ -53,6 +47,11 @@ public class MainApp extends JFrame {
 	
 	private static final long serialVersionUID = -408641277064642917L;
 
+	/*
+	 * La ruta hasta el archivo .properties que contiene los datos para
+	 * conectarnos a la Base de Datos
+	 */
+	private static final String POSTGRES_PROPERTIES_PATH = "src/postgres.properties";
 	private static String DIR_PATH;
 	
 	JPanel basic;         //panel principal de la App
@@ -84,11 +83,10 @@ public class MainApp extends JFrame {
 	public MainApp() {
     	
     	DBInterface db = null;
-    	try{
-    		Drivers.cargarDrivers();
-    		Connection conPostgres = Conexiones.obtenerConexion(Conexiones.DBMS_TYPE_POSTGRES);
+    	try{		
+    		Connection conPostgres = Conector.conectar(POSTGRES_PROPERTIES_PATH);
     		db = new DBInterface(conPostgres);
-    		ArrayList<SysVar>sv = db.selectSysVarObjByName("DIR_PATH");
+    		ArrayList<SysVar> sv = db.selectSysVarObjByName("DIR_PATH");
     		if(!sv.isEmpty())
     			MainApp.DIR_PATH = sv.get(0).getValue();
     		else{
@@ -370,9 +368,8 @@ public class MainApp extends JFrame {
 		
 		DBInterface db = null;
 		try{
-			Drivers.cargarDrivers();
-			Connection conPostgres = Conexiones.obtenerConexion(Conexiones.DBMS_TYPE_POSTGRES);
-			db = new DBInterface(conPostgres);
+			Connection conPostgres = Conector.conectar(POSTGRES_PROPERTIES_PATH);
+    		db = new DBInterface(conPostgres);
 			emailTable = new JTable(new AlertsTableModel(db.selectAllBitacoraObj()));
 		} catch (ClassNotFoundException e) {
 			System.out.println("No se encontro el driver");

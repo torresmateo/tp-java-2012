@@ -6,11 +6,13 @@ import java.sql.SQLException;
 import java.util.Iterator;
 
 import database.Bitacora;
-import database.Conexiones;
+import database.Conector;
 import database.DBInterface;
-import database.Drivers;
 
 public class Test {
+	
+	private static final String POSTGRES_PROPERTIES_PATH = "src/postgres.properties";
+	
 	public static void main(String[] args) {
 		System.out.println("mercurial test");
 		System.out.println("push test");
@@ -19,8 +21,7 @@ public class Test {
 		
 		DBInterface db = null;
 		try{
-			Drivers.cargarDrivers();
-			Connection conPostgres = Conexiones.obtenerConexion(Conexiones.DBMS_TYPE_POSTGRES);
+			Connection conPostgres = Conector.conectar(POSTGRES_PROPERTIES_PATH);
 			db = new DBInterface(conPostgres);
 		
 			ResultSet rs = db.selectAllBitacora();

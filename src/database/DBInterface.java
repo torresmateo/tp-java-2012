@@ -5,7 +5,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Iterator;
 /**
@@ -20,7 +19,7 @@ public class DBInterface {
 	public DBInterface(Connection conn){
 		this.conn = conn;
 	}
-	
+	/*
 	public static void main(String[] args){
 		DBInterface db = null;
 		try{
@@ -57,7 +56,7 @@ public class DBInterface {
 		}
 		
 		
-	}
+	}*/
 	//========================================================================
 	//						Bitacora
 	//========================================================================
