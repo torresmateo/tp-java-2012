@@ -64,14 +64,15 @@ public class MainApp extends JFrame {
 	DefaultMutableTreeNode root; //nodo raiz tree
 	DefaultTreeModel model; //modelo de datos del tree
 	Hashtable<String, Object> htTree; //Hashtable para el Tree de los servers
-	Hashtable<String, Properties> serverData; //
+	Hashtable<String, Properties> serverData; 
+	//Hashtable paralelo al Tree, para pasar datos a EditDialog 
 	
-	String lastSelectedServerName; 
-	DefaultMutableTreeNode lastSelectedNode;
+	String lastSelectedServerName; //nombre del ultimo servidor seleccionado del tree
+	DefaultMutableTreeNode lastSelectedNode; //ultimo nodo seleccionado del tree
 	
 	JToolBar toolbar;     //toolbar de la App
-	AddServerDialog AddDialog; //Ventana de dialogo de Add
-	EditServerDialog EditDialog; //Ventana de dialogo de edit
+	AddServerDialog AddDialog; //Ventana de dialogo para agregar server
+	EditServerDialog EditDialog; //Ventana de dialogo de editar server
 	
 
     public static String getDIR_PATH() {
@@ -101,8 +102,8 @@ public class MainApp extends JFrame {
     		e.printStackTrace();
     	}
     	
-    	AddDialog = new AddServerDialog(this); //dialogo modal
-    	EditDialog = new EditServerDialog(this); //dialogo modal
+    	AddDialog = new AddServerDialog(this); 
+    	EditDialog = new EditServerDialog(this);
     	serverData = new Hashtable<String, Properties>();
         initUI();
     }
@@ -148,122 +149,11 @@ public class MainApp extends JFrame {
         toolbar.add(exitButton);
         toolbar.setFloatable(false);
         
-        
-        tree.addTreeSelectionListener(new TreeSelectionListener() {
-			@Override
-			public void valueChanged(TreeSelectionEvent e) {
-				 lastSelectedNode = (DefaultMutableTreeNode)
-                         tree.getLastSelectedPathComponent();
-				 
-				 if (lastSelectedNode == null || lastSelectedNode.isRoot()){
-					 lastSelectedServerName = null;
-					 return;
-				 }
-				 
-				 if(lastSelectedNode.isLeaf()){
-					 lastSelectedServerName = lastSelectedNode.getParent().toString();
-					// System.out.println(node.getParent().toString());
-				 }
-				 else{
-					 lastSelectedServerName = lastSelectedNode.toString();
-					// System.out.println(node.toString()); 
-				 }	 
-			}
-		});
-
-        //Anonymous inner class
-        addButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
-            	 SwingUtilities.invokeLater(new Runnable() {
-                     public void run() {
-                    	 AddDialog.setVisible(true);
-                         //como es modal, al llegar aquí es porque se ha cerrado la
-                         //ventana
-                         if(AddDialog.newServerProp()!=null){         
-                        	 //cargar nuevo server file properties
-                        	 addNewServerFileToTree(AddDialog);
-                         }
-                     }
-                 });
-            }
-        });
-        
-        editButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
-            	 SwingUtilities.invokeLater(new Runnable() {
-                     public void run() {
-                    	 if(lastSelectedNode==null){
-                    		 JOptionPane.showMessageDialog(basic, "You must " +
-                    		 		"select a server first!",
-                                     "Error", JOptionPane.ERROR_MESSAGE);
-                    		 return;
-                    	 }
-                    	 if(lastSelectedNode.isRoot()){
-                    		 JOptionPane.showMessageDialog(basic, "Can't " +
-                    		 		"edit root",
-                                     "Error", JOptionPane.ERROR_MESSAGE);
-                    		 return;
-                    	 }
-                    	 EditDialog.loadFields();
-                         EditDialog.setVisible(true);
-                         //como es modal, al llegar aquí es porque se ha cerrado la
-                         //ventana
-                         if(EditDialog.newServerProp()!=null){         
-                        	 //cargar nuevo server file properties
-                        	 if(lastSelectedNode.isLeaf()){
-	                    		 ((DefaultTreeModel) tree.getModel()).
-	                        	 removeNodeFromParent((MutableTreeNode) lastSelectedNode.getParent()); 	
-                    		 }
-                    		 else{
-                    			 ((DefaultTreeModel) tree.getModel()).
-	                        	 removeNodeFromParent(lastSelectedNode);
-                    		 }
-                        	 addNewServerFileToTree(EditDialog);	
-                         }
-                         
-                     }
-                 });
-            }
-        });
-        
-        deleteButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
-            	 SwingUtilities.invokeLater(new Runnable() {
-                     public void run() {
-                    	 if(lastSelectedNode.isRoot()){
-                    		 JOptionPane.showMessageDialog(basic, "Can't delete root!",
-                                     "Error", JOptionPane.ERROR_MESSAGE);
-                    		 return;
-                    	 }                  	 
-                    	 int opt = JOptionPane.showConfirmDialog(basic,"Are you " +
-                    	 		"sure you want to delete \""+getLastSelectedServerName()+"\"?",
-                        		 "Exit",JOptionPane.YES_NO_OPTION);
-                    	 if(opt==0){
-                    		 serverData.remove(getLastSelectedServerName());
-                    		 FileManager.remove(getLastSelectedServerName());
-                    		 if(lastSelectedNode.isLeaf()){
-	                    		 ((DefaultTreeModel) tree.getModel()).
-	                        	 removeNodeFromParent((MutableTreeNode) lastSelectedNode.getParent()); 	
-                    		 }
-                    		 else{
-                    			 ((DefaultTreeModel) tree.getModel()).
-	                        	 removeNodeFromParent(lastSelectedNode);
-                    		 }
-                    	 }
-                     }
-                 });
-            }
-        });
-        
-        exitButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent event) {
-            	int opt = JOptionPane.showConfirmDialog(basic,"Are you sure to quit?",
-            		 "Exit",JOptionPane.YES_NO_OPTION);
-            	if(opt==0)
-                   System.exit(0);
-            }
-
-        });
+        tree.addTreeSelectionListener(new TreeListener());
+        addButton.addActionListener(new AddButtonListener());
+        editButton.addActionListener(new EditButtonListener());
+        deleteButton.addActionListener(new DeleteButtonListener());
+        exitButton.addActionListener(new ExitButtonListener());
         
         add(basic);
 
@@ -326,7 +216,132 @@ public class MainApp extends JFrame {
 	}
     
     /*
-     * Others
+     * Listeners
+     */
+    
+    class TreeListener implements TreeSelectionListener{
+    	@Override
+		public void valueChanged(TreeSelectionEvent e) {
+			 lastSelectedNode = (DefaultMutableTreeNode)
+                     tree.getLastSelectedPathComponent();
+			 
+			 if (lastSelectedNode == null || lastSelectedNode.isRoot()){
+				 lastSelectedServerName = null;
+				 return;
+			 }
+			 
+			 if(lastSelectedNode.isLeaf()){
+				 lastSelectedServerName = lastSelectedNode.getParent().toString();
+				// System.out.println(node.getParent().toString());
+			 }
+			 else{
+				 lastSelectedServerName = lastSelectedNode.toString();
+				// System.out.println(node.toString()); 
+			 }	 
+		}
+    }
+    
+    class AddButtonListener implements ActionListener{
+    	 public void actionPerformed(ActionEvent event) {
+        	 SwingUtilities.invokeLater(new Runnable() {
+                 public void run() {
+                	 AddDialog.setVisible(true);
+                     //como es modal, al llegar aquí es porque se ha cerrado la
+                     //ventana
+                     if(AddDialog.newServerProp()!=null){         
+                    	 //cargar nuevo server file properties
+                    	 addNewServerFileToTree(AddDialog);
+                     }
+                 }
+             });
+        }
+    }
+    
+    class EditButtonListener implements ActionListener{
+    	 public void actionPerformed(ActionEvent event) {
+        	 SwingUtilities.invokeLater(new Runnable() {
+                 public void run() {
+                	 if(lastSelectedNode==null){
+                		 JOptionPane.showMessageDialog(basic, "You must " +
+                		 		"select a server first!",
+                                 "Error", JOptionPane.ERROR_MESSAGE);
+                		 return;
+                	 }
+                	 if(lastSelectedNode.isRoot()){
+                		 JOptionPane.showMessageDialog(basic, "Can't " +
+                		 		"edit root",
+                                 "Error", JOptionPane.ERROR_MESSAGE);
+                		 return;
+                	 }
+                	 EditDialog.loadFields();
+                     EditDialog.setVisible(true);
+                     //como es modal, al llegar aquí es porque se ha cerrado la
+                     //ventana
+                     if(EditDialog.newServerProp()!=null){         
+                    	 //cargar nuevo server file properties
+                    	 if(lastSelectedNode.isLeaf()){
+                    		 ((DefaultTreeModel) tree.getModel()).
+                        	 removeNodeFromParent((MutableTreeNode) lastSelectedNode.getParent()); 	
+                		 }
+                		 else{
+                			 ((DefaultTreeModel) tree.getModel()).
+                        	 removeNodeFromParent(lastSelectedNode);
+                		 }
+                    	 addNewServerFileToTree(EditDialog);	
+                     }
+                     
+                 }
+             });
+        }
+    }
+    
+    class DeleteButtonListener implements ActionListener{
+    	public void actionPerformed(ActionEvent event) {
+       	 SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                	 if(lastSelectedNode==null){
+                		 JOptionPane.showMessageDialog(basic, "You must " +
+                		 		"select a server first!",
+                                 "Error", JOptionPane.ERROR_MESSAGE);
+                		 return;
+                	 }    	
+	               	 if(lastSelectedNode.isRoot()){
+	               		 JOptionPane.showMessageDialog(basic, "Can't delete root!",
+	                                "Error", JOptionPane.ERROR_MESSAGE);
+	               		 return;
+	               	 }                  	 
+	               	 int opt = JOptionPane.showConfirmDialog(basic,"Are you " +
+               	 		"sure you want to delete \""+getLastSelectedServerName()+"\"?",
+                   		 "Exit",JOptionPane.YES_NO_OPTION);
+	               	 if(opt==0){
+	               		 serverData.remove(getLastSelectedServerName());
+	               		 FileManager.remove(getLastSelectedServerName());
+	               		 if(lastSelectedNode.isLeaf()){
+	                   		 ((DefaultTreeModel) tree.getModel()).
+	                       	 removeNodeFromParent((MutableTreeNode) lastSelectedNode.getParent()); 	
+	               		 }
+	               		 else{
+	               			 ((DefaultTreeModel) tree.getModel()).
+	                       	 removeNodeFromParent(lastSelectedNode);
+	               		 }
+	               	 }
+                }
+            });
+       }
+    }
+    
+    class ExitButtonListener implements ActionListener{
+    	 public void actionPerformed(ActionEvent event) {
+         	int opt = JOptionPane.showConfirmDialog(basic,"Are you sure to quit?",
+         		 "Exit",JOptionPane.YES_NO_OPTION);
+         	if(opt==0)
+                System.exit(0);
+         }
+    }
+    
+    
+    /*
+     * Utils
      */
 
     
@@ -340,6 +355,10 @@ public class MainApp extends JFrame {
 		}
 		return StringProp;	
     }
+    
+    /*
+     * Add new server file
+     */
     
     public void addNewServerFileToTree(ServerDialog sdialog){
     	 Hashtable<String, Object> ht = new Hashtable<String, Object>();
