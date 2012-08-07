@@ -43,8 +43,6 @@ public class PropertiesClaveValor {
 					.hasMoreElements();) {
 				/* Obtenemos el objeto */
 				Object obj = e.nextElement();
-				System.out.println(obj + ": "
-						+ propiedades.getProperty(obj.toString()));
 			}
 			// prop.store(salida, "Guardando preferencias");
 		} catch (IOException ioException) {

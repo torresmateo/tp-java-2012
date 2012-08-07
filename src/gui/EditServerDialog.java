@@ -5,12 +5,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Properties;
 
 import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.JTextField;
 
 
 import parser.FileManager;
@@ -19,28 +21,50 @@ import parser.Parser;
 import utils.ServerProperties;
 
 
-public class AddServerDialog extends ServerDialog{
+public class EditServerDialog extends ServerDialog{
 	
+     MainApp father;
+     Properties serverProp;
 
-    public AddServerDialog(JFrame father) {
+    public EditServerDialog(MainApp father) {
     	//ventana modal
-    	super(father);
+    	super((JFrame)father);
+    	this.father=father;
     	data = new HashMap<ServerProperties, String>();
     	new_save=false;
-        initAddUI();
+        initEditUI();
         
     }
+    
+    public void loadFields(){
+    	String serverName = father.getLastSelectedServerName();
+    	Hashtable<String, Properties> serverData = father.getServerData();
+    	Properties serverProp = serverData.get(serverName);
+    	tfaddress.setText((String) serverProp.get("address"));
+    	tfalias.setText((String) serverProp.get("alias"));
+    	tfcheckint.setText((String) serverProp.get("check_interval"));
+    	tfcurrentstate.setText((String) serverProp.get("current_state"));
+        tfemailnotif.setText((String) serverProp.get("email_notification"));
+        tfhostname.setText((String) serverProp.get("host_name"));
+        tflastcheck.setText((String) serverProp.get("last_check"));
+        tflastnotif.setText((String) serverProp.get("last_notification"));
+        tfmaxcheckattempts.setText((String) serverProp.get("max_check_attempts"));
+        tfnotifinterval.setText((String) serverProp.get("notification_interval"));
+        tfportslist.setText((String) serverProp.get("ports_list"));
+        tfretryint.setText((String) serverProp.get("retry_interval"));
+        tftolerance.setText((String) serverProp.get("tolerance_attempts"));
+    }
 
-    public final void initAddUI() {
+    public final void initEditUI() {
 
-    	hintTitle.setText("Add Server properties");
+    	hintTitle.setText("Edit Server properties");
     	
-        JButton save = new JButton("Save");
-        save.setMnemonic(KeyEvent.VK_S);
+        JButton update = new JButton("Update");
+        update.setMnemonic(KeyEvent.VK_S);
         JButton close = new JButton("Close");
         close.setMnemonic(KeyEvent.VK_C);
         
-        save.addActionListener(new ActionListener() {
+        update.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
             	data.put(ServerProperties.ADDRESS,tfaddress.getText());
             	data.put(ServerProperties.ALIAS,tfalias.getText());
@@ -55,15 +79,15 @@ public class AddServerDialog extends ServerDialog{
             	data.put(ServerProperties.PORTS_LIST,tfportslist.getText());
             	data.put(ServerProperties.RETRY_INTERVAL,tfretryint.getText());
             	data.put(ServerProperties.TOLERANCE_ATTEMPTS,tftolerance.getText());            	
-            	if(FileManager.save(data)){
-	            	JOptionPane.showMessageDialog(basic, "It has been created successfully!",
+            	if(FileManager.update(father.getLastSelectedServerName(),data)){
+	            	JOptionPane.showMessageDialog(basic, "It has been updated successfully!",
 	                        "Information", JOptionPane.INFORMATION_MESSAGE);
 	            	new_save=true;
 	            	cleanFields();
 	            	dispose();
             	}
             	else{
-            		 JOptionPane.showMessageDialog(basic, "File exists!",
+            		 JOptionPane.showMessageDialog(basic, "Another server has the same alias",
                              "Error", JOptionPane.ERROR_MESSAGE);
             	}
             }
@@ -78,16 +102,16 @@ public class AddServerDialog extends ServerDialog{
 
         });
 
-        bottom.add(save);
+        bottom.add(update);
         bottom.add(Box.createRigidArea(new Dimension(5, 0)));
         bottom.add(close);
         bottom.add(Box.createRigidArea(new Dimension(15, 0)));
         
-        basic.add(Box.createRigidArea(new Dimension(0, 30)));
+        basic.add(Box.createRigidArea(new Dimension(0, 25)));
 
         bottom.setMaximumSize(new Dimension(450, 0));
 
-        setTitle("Add new server configuration");
+        setTitle("Edit server configuration");
     }
     
 }
