@@ -107,7 +107,7 @@ public class EditServerDialog extends ServerDialog{
         bottom.add(close);
         bottom.add(Box.createRigidArea(new Dimension(15, 0)));
         
-        basic.add(Box.createRigidArea(new Dimension(0, 15)));
+        basic.add(Box.createRigidArea(new Dimension(0, 25)));
 
         bottom.setMaximumSize(new Dimension(450, 0));
 
