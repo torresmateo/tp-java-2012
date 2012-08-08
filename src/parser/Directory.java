@@ -1,6 +1,7 @@
 package parser;
 
 import java.io.File;
+import java.io.FileFilter;
 
 public class Directory {
 	
@@ -14,10 +15,20 @@ public class Directory {
 	
 	public File[] list(){
 		File file = new File(this.DIR_PATH);
-		if(file.exists()){
-			File files[] = file.listFiles();
-			return files;
-		}
-		return null;
+		File files[] = file.listFiles(new PropertiesFileFilter());
+		return files;
+	}
+	
+	public class PropertiesFileFilter implements FileFilter
+	{
+
+	  public boolean accept(File file)
+	  {
+	      if (file.getName().toLowerCase().endsWith(".properties"))
+	      {
+	        return true;
+	      }
+	    return false;
+	  }
 	}
 }
