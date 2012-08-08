@@ -1,7 +1,6 @@
 package gui;
 
 import java.awt.BorderLayout;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -23,6 +22,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
@@ -59,7 +60,10 @@ public class MainApp extends JFrame {
 	JTabbedPane tabpanel; //panel de tabs de la App
 	JPanel serverPanel;   //panel del tab server
 	JPanel emailPanel;    //panel del tab email
+	JPanel searchEmailPanel; //panel del buscador de alertas
 	JTable emailTable;    //tabla con emails de alerta
+	
+	AlertsTableModel alertsTableModel; //modelo para la tabla de emails de alertas
 	
 	JTree tree;           //tree de los servers
 	DefaultMutableTreeNode root; //nodo raiz tree
@@ -74,6 +78,7 @@ public class MainApp extends JFrame {
 	JToolBar toolbar;     //toolbar de la App
 	AddServerDialog AddDialog; //Ventana de dialogo para agregar server
 	EditServerDialog EditDialog; //Ventana de dialogo de editar server
+	SearchEmailAlertDialog searchEmailAlertDialog; //Ventana de dialogo para buscar alerta
 	
 
     public static String getDIR_PATH() {
@@ -82,7 +87,6 @@ public class MainApp extends JFrame {
 
 
 	public MainApp() {
-    	
     	DBInterface db = null;
     	try{
     		Drivers.cargarDrivers();
@@ -106,6 +110,8 @@ public class MainApp extends JFrame {
     	AddDialog = new AddServerDialog(this); 
     	EditDialog = new EditServerDialog(this);
     	serverData = new Hashtable<String, Properties>();
+    	searchEmailAlertDialog = new SearchEmailAlertDialog(this);
+    	
         initUI();
     }
 
@@ -328,6 +334,25 @@ public class MainApp extends JFrame {
          }
     }
     
+    class SearchEmailAlertButtonListener implements ActionListener{
+    	public void actionPerformed( ActionEvent event ){
+    		SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                	searchEmailAlertDialog.setVisible(true);
+                	
+                	try{
+                		Connection conPostgres = Conexiones.obtenerConexion(Conexiones.DBMS_TYPE_POSTGRES);
+            			DBInterface db = new DBInterface(conPostgres);
+            			alertsTableModel.setModel(db.selectBitacoraObj(searchEmailAlertDialog.getWhereParameters()));
+                	} catch (SQLException ex) {
+            			System.out.println("No se pudo conectar" + ex.getMessage());
+            			ex.printStackTrace();
+            		}
+                	alertsTableModel.fireTableChanged(null);
+                }
+    		});
+    	}
+    }
     
     /*
      * Utils
@@ -366,14 +391,15 @@ public class MainApp extends JFrame {
      */
     
     public JPanel createEmailPanel(String text) {
-		JPanel emailPanel = new JPanel();
+		JPanel emailPanel = new JPanel(new BorderLayout());
 		
 		DBInterface db = null;
 		try{
 			Drivers.cargarDrivers();
 			Connection conPostgres = Conexiones.obtenerConexion(Conexiones.DBMS_TYPE_POSTGRES);
 			db = new DBInterface(conPostgres);
-			emailTable = new JTable(new AlertsTableModel(db.selectAllBitacoraObj()));
+			alertsTableModel = new AlertsTableModel(db.selectAllBitacoraObj());
+			emailTable = new JTable(alertsTableModel);
 		} catch (ClassNotFoundException e) {
 			System.out.println("No se encontro el driver");
 			e.printStackTrace();
@@ -382,11 +408,15 @@ public class MainApp extends JFrame {
 			e.printStackTrace();
 		}
 		
+		JPanel searchEmailPanel = new JPanel();
+        
+        JButton searchButton = new JButton("Search Options");
+        searchButton.addActionListener(new SearchEmailAlertButtonListener());
+        searchEmailPanel.add(searchButton);
 		
-		//new JTable
-		//System.out.println(db.selectAllBitacoraObj());
-		JScrollPane scrollPane = new JScrollPane(emailTable);
-		emailPanel.add(scrollPane);
+		emailPanel.add(new JScrollPane(emailTable), BorderLayout.CENTER);
+		emailPanel.add(searchEmailPanel, BorderLayout.NORTH);
+		
 		
 		return emailPanel;
 	}
