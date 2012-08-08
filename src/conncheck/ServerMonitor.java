@@ -30,7 +30,7 @@ public class ServerMonitor extends Thread{
 	public void run(){
 		Connection conPostgres = null;
 		try{
-			conPostgres = Conector.conectar(MainApp.POSTGRES_PROPERTIES_PATH);
+			conPostgres = Conector.connectByFile(MainApp.POSTGRES_PROPERTIES_PATH);
 		} catch (ClassNotFoundException e) {
 			logger.error("No se encontro el driver");
 		} catch (SQLException e) {
