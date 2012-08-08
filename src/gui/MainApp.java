@@ -29,6 +29,9 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeSelectionModel;
 
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
+
 import conncheck.ServerMonitor;
 import database.Conector;
 import database.DBInterface;
@@ -51,8 +54,11 @@ public class MainApp extends JFrame {
 	 * La ruta hasta el archivo .properties que contiene los datos para
 	 * conectarnos a la Base de Datos
 	 */
-	public static final String POSTGRES_PROPERTIES_PATH = "src/postgres.properties2";
-	public static String DIR_PATH;
+	public static final String POSTGRES_PROPERTIES_PATH = "src/postgres.properties";
+	private static String DIR_PATH;
+	
+	static Logger logger = Logger.getLogger(ServerMonitor.class);
+	
 	
 	JPanel basic;         //panel principal de la App
 	JTabbedPane tabpanel; //panel de tabs de la App
@@ -95,7 +101,8 @@ public class MainApp extends JFrame {
 			this.configButton.doClick();
 			defaultConfig=true;
 		}
-    	
+		PropertyConfigurator.configure("src/log4j.properties");
+		logger.debug("Iniciada la Ejecucion del Programa");
     	DBInterface db = null;
     	try{		
     		Connection conPostgres = Conector.connectByFile(POSTGRES_PROPERTIES_PATH);
@@ -117,7 +124,7 @@ public class MainApp extends JFrame {
     }
 
     public final void initUI() {
-    	
+    	logger.debug("Iniciado el dibujado de la interfaz");
     	basic = new JPanel(new BorderLayout());
 
     	//Panel de Tabs
@@ -194,8 +201,8 @@ public class MainApp extends JFrame {
 			serverData.put(servers_file[i].getName(),p.readProperties());
 			htTree.put(servers_file[i].getName(),propertiesToStringArray(p.readProperties()));
 			//TODO iniciar el hilo de monitor de este server
-			ServerMonitor server = new ServerMonitor(p.readProperties());
-			server.start();
+			ServerMonitor serverCheck = new ServerMonitor(p.readProperties());
+			serverCheck.start();
 		} 
 		
 		JTree.DynamicUtilTreeNode.createChildren(root, htTree);
@@ -350,7 +357,7 @@ public class MainApp extends JFrame {
     
     public String[] propertiesToStringArray(Properties prop){
     	String[] StringProp = new String[13];
-    	StringBuffer sb = new StringBuffer("");
+    	//StringBuffer sb = new StringBuffer(""); TODO ver porque esto no se usa o borrar
     	int i=0;
     	for (Enumeration<Object> e = prop.keys(); e.hasMoreElements();) {
 			Object obj = e.nextElement();

@@ -71,7 +71,7 @@ public class DBInterface {
 		Statement stmt = conn.createStatement();
 		ResultSet rs = stmt.executeQuery(sql);
 		while(rs.next()){
-			returnArray.add(new Bitacora(
+			Bitacora auxBitacora = new Bitacora(
 						rs.getInt("id_bitacora_servicios"),
 						rs.getString("alias"),
 						rs.getString("direccion_ip"),
@@ -79,7 +79,9 @@ public class DBInterface {
 						rs.getString("email"),
 						rs.getString("estado"),
 						rs.getString("marca_tiempo")
-					));
+					);
+			auxBitacora.setMarcaTiempoDate(rs.getTimestamp("marca_tiempo"));
+			returnArray.add(auxBitacora);
 		}
 		return returnArray;
 	}
@@ -99,15 +101,17 @@ public class DBInterface {
 		Statement stmt = conn.createStatement();
 		ResultSet rs = stmt.executeQuery("select * from bitacora_servicios");
 		while(rs.next()){
-			returnArray.add(new Bitacora(
-						rs.getInt("id_bitacora_servicios"),
-						rs.getString("alias"),
-						rs.getString("direccion_ip"),
-						rs.getInt("puerto"),
-						rs.getString("email"),
-						rs.getString("estado"),
-						rs.getString("marca_tiempo")
-					));
+			Bitacora auxBitacora = new Bitacora(
+					rs.getInt("id_bitacora_servicios"),
+					rs.getString("alias"),
+					rs.getString("direccion_ip"),
+					rs.getInt("puerto"),
+					rs.getString("email"),
+					rs.getString("estado"),
+					rs.getString("marca_tiempo")
+				);
+			auxBitacora.setMarcaTiempoDate(rs.getTimestamp("marca_tiempo"));
+			returnArray.add(auxBitacora);
 		}
 		return returnArray;
 	}

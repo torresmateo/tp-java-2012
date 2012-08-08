@@ -46,7 +46,7 @@ public class MonitorEMail {
 	}
 	
 	// Setear Asunto
-	void setSubject(String subject){
+	public void setSubject(String subject){
 		try{
 			message.setSubject(subject);
 		} catch (Exception ex) {
@@ -55,7 +55,7 @@ public class MonitorEMail {
 	}
 	
 	// Setear el cuerpo del mail
-	void setBody(String body){
+	public void setBody(String body){
 		try{
 			message.setText(body);
 		} catch (Exception ex) {
@@ -64,7 +64,7 @@ public class MonitorEMail {
 	}
 	
 	// Enviar el eMail
-	void sendEMail(){
+	public void sendEMail(){
 		try{
 			transport = session.getTransport("smtp");
 			transport.connect("tcpipservicesmonitor@gmail.com","JavaUca2012");
@@ -76,7 +76,7 @@ public class MonitorEMail {
 	}
 	
 	// A�adir destinatarios
-	void addRecipient(String recipient){
+	public void addRecipient(String recipient){
 		try{
 			message.addRecipient(Message.RecipientType.TO, new InternetAddress(recipient));
 		} catch (Exception ex) {
@@ -85,7 +85,7 @@ public class MonitorEMail {
 	}
 	
 	// Descartar todos los destinatarios
-	void removeRecipients(){
+	public void removeRecipients(){
 		try{
 			message.setRecipients(Message.RecipientType.TO, "");
 		} catch (Exception ex) {
@@ -94,7 +94,7 @@ public class MonitorEMail {
 	}
 	
 	// Imprimir destinatarios
-	void printRecipients(){
+	public void printRecipients(){
 		try{
 			Address[] direcciones = message.getAllRecipients();
 			for (int i = 0; i < direcciones.length; i++) {
