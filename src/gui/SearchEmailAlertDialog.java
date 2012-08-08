@@ -178,25 +178,25 @@ public class SearchEmailAlertDialog extends JDialog{
 	
 	public String getWhereParameters(){
 		String whereSQL = new String("");
-		if(!data.get(SearchParameters.ALIAS).equals("")){
+		if(data.containsKey(SearchParameters.ALIAS) && !data.get(SearchParameters.ALIAS).equals("")){
 			whereSQL += " alias = '"+data.get(SearchParameters.ALIAS)+"' AND ";
 		}
-		if(!data.get(SearchParameters.ADDRESS).equals("")){
+		if(data.containsKey(SearchParameters.ADDRESS) && !data.get(SearchParameters.ADDRESS).equals("")){
 			whereSQL += " direccion_ip = '"+data.get(SearchParameters.ADDRESS)+"' AND ";
 		}
-		if(!data.get(SearchParameters.PUERTO).equals("")){
+		if(data.containsKey(SearchParameters.PUERTO) && !data.get(SearchParameters.PUERTO).equals("")){
 			whereSQL += " puerto = '"+data.get(SearchParameters.PUERTO)+"' AND ";
 		}
-		if(!data.get(SearchParameters.EMAIL).equals("")){
+		if(data.containsKey(SearchParameters.EMAIL) && !data.get(SearchParameters.EMAIL).equals("")){
 			whereSQL += " email = '"+data.get(SearchParameters.EMAIL)+"' AND ";
 		}
-		if(!data.get(SearchParameters.ESTADO).equals("")){
+		if(data.containsKey(SearchParameters.ESTADO) && !data.get(SearchParameters.ESTADO).equals("")){
 			whereSQL += " estado = '"+data.get(SearchParameters.ESTADO)+"' AND ";
 		}
-		if(!data.get(SearchParameters.FECHAINICIAL).equals("")){
+		if(data.containsKey(SearchParameters.FECHAINICIAL) && !data.get(SearchParameters.FECHAINICIAL).equals("")){
 			whereSQL += " marca_tiempo >= '"+data.get(SearchParameters.FECHAINICIAL)+"' AND ";
 		}
-		if(!data.get(SearchParameters.FECHAFINAL).equals("")){
+		if(data.containsKey(SearchParameters.FECHAFINAL) && !data.get(SearchParameters.FECHAFINAL).equals("")){
 			whereSQL += " marca_tiempo <= '"+data.get(SearchParameters.FECHAFINAL)+"' AND ";
 		}
 		whereSQL += " TRUE ";
