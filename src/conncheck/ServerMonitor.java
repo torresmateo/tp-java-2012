@@ -55,6 +55,7 @@ public class ServerMonitor extends Thread{
 		String alias = serverInfo.get("alias").toString();
 		String address = serverInfo.get("address").toString();
 		ArrayList<ConnectionChecker> connList = stringToPortArray(serverInfo.get("ports_list").toString(),address);
+		
 		MonitorEMail mail = new MonitorEMail();
 		mail.addRecipient(targetMail);
 		mail.addRecipient("minardifer@gmail.com");//te va a llegar el spam de la vida :)
@@ -80,7 +81,8 @@ public class ServerMonitor extends Thread{
 							date = new Timestamp(new java.util.Date().getTime());
 							mail.setSubject("Alerta del Sistema de Monitoreo de Conecciones");
 							mailBody = "Fallo la coneccion con la siguiente configuracion:\n";
-							mailBody += "address = " + serverInfo.get("address").toString() + "\n";
+							mailBody += "alias = " + alias + "\n";
+							mailBody += "address = " + address + "\n";
 							mailBody += "port = " + currentConnection.getPort() + "\n";
 							mail.setBody(mailBody);
 							

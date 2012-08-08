@@ -32,10 +32,10 @@ public class ConnectionChecker {
 			socket = new Socket();
 			socket.connect(new InetSocketAddress(this.host, this.port),1000);
 		}catch(SocketTimeoutException e){//handleamos el fallo en que no se pudo conectar por timeout
-			logger.error("La coneccion " + this.host + ":" + this.port + " no se pudo establecer, Timeout Reached");
+			logger.error("La conexion " + this.host + ":" + this.port + " no se pudo establecer, Timeout Reached");
 			returnValue = false;
 		}catch(IOException e){
-			logger.error("La coneccion " + this.host + ":" + this.port + " no se pudo establecer, Connection Refused");
+			logger.error("La conexion " + this.host + ":" + this.port + " no se pudo establecer, Connection Refused");
 			returnValue = false;
 		}catch(Exception e){//otro tipo de errores
 			logger.error(e.getStackTrace());
@@ -56,9 +56,9 @@ public class ConnectionChecker {
 	public static void main(String args[]){
 		ConnectionChecker connCheck = new ConnectionChecker("www.google.com",80);
 		if(connCheck.Check()){
-			System.out.println("hay coneccion");
+			System.out.println("hay conexion");
 		}else{
-			System.out.println("NO hay coneccion");
+			System.out.println("NO hay conexion");
 		}
 	}
 	
