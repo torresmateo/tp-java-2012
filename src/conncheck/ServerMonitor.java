@@ -73,7 +73,7 @@ public class ServerMonitor extends Thread{
 				itr = connList.iterator();
 				while(itr.hasNext()){
 					currentConnection = itr.next();
-					if(!currentConnection.Check()){
+					if(!currentConnection.Check()){		
 						availableAttempts = maxCheckAttempts;
 						while(availableAttempts > 0){
 							availableAttempts--;
