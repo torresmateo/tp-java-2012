@@ -1,4 +1,8 @@
 package database;
+
+
+import java.sql.Timestamp;
+
 /**
  * Objeto Bitacora
  * 
@@ -13,6 +17,7 @@ public class Bitacora {
 	private String email;
 	private String estado;
 	private String marcaTiempo;
+	private Timestamp marcaTiempoDate;
 	
 	public Bitacora(int iD, String alias, String direccionIP, int puerto,
 			String email, String estado, String marcaTiempo) {
@@ -79,6 +84,12 @@ public class Bitacora {
 	public void setMarcaTiempo(String marcaTiempo) {
 		this.marcaTiempo = marcaTiempo;
 	}
+	public Timestamp getMarcaTiempoDate() {
+		return this.marcaTiempoDate;
+	}
+	public void setMarcaTiempoDate(Timestamp timestamp) {
+		this.marcaTiempoDate = timestamp;
+	}
 
 	@Override
 	public String toString() {
@@ -86,7 +97,4 @@ public class Bitacora {
 				+ direccionIP + ", puerto=" + puerto + ", email=" + email
 				+ ", estado=" + estado + ", marcaTiempo=" + marcaTiempo + "]";
 	}
-	
-	
-		
 }

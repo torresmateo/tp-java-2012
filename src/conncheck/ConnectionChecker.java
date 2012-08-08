@@ -1,8 +1,14 @@
 package conncheck;
 
+import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
+
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
+
+import com.sun.mail.iap.ConnectionException;
 /**
  * Clase que hace el checkeo de la conecccion
  */
@@ -10,7 +16,12 @@ public class ConnectionChecker {
 	private Socket socket;
 	private int port;
 	private String host;
+	static Logger logger = Logger.getLogger(ServerMonitor.class);
+	
+	
+	
 	ConnectionChecker(String host, int port){
+		PropertyConfigurator.configure("src/log4j.properties");
 		this.host = host;
 		this.port = port;
 	}
@@ -21,18 +32,20 @@ public class ConnectionChecker {
 			socket = new Socket();
 			socket.connect(new InetSocketAddress(this.host, this.port),1000);
 		}catch(SocketTimeoutException e){//handleamos el fallo en que no se pudo conectar por timeout
-			System.out.println("La coneccion no se pudo establecer, se llega al timeout");
-			e.printStackTrace();
+			logger.error("La coneccion " + this.host + ":" + this.port + " no se pudo establecer, Timeout Reached");
+			returnValue = false;
+		}catch(IOException e){
+			logger.error("La coneccion " + this.host + ":" + this.port + " no se pudo establecer, Connection Refused");
 			returnValue = false;
 		}catch(Exception e){//otro tipo de errores
-			e.printStackTrace();
+			logger.error(e.getStackTrace());
 			returnValue = false;
 		}finally{//cerramos el soket
 			if (socket != null){
 				try{
 					socket.close();
 				}catch(Exception e){//en caso en que el cierre de socket falle
-					e.printStackTrace();
+					logger.error(e.getStackTrace());
 				}
 			}
 		}
@@ -47,5 +60,17 @@ public class ConnectionChecker {
 		}else{
 			System.out.println("NO hay coneccion");
 		}
+	}
+	
+	public int getPort() {
+		return port;
+	}
+	public String getHost() {
+		return host;
+	}
+	@Override
+	public String toString() {
+		return "ConnectionChecker [socket=" + socket + ", port=" + port
+				+ ", host=" + host + "]";
 	}
 }
