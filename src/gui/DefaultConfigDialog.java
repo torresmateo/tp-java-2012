@@ -8,11 +8,13 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.io.File;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Properties;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -56,10 +58,15 @@ public class DefaultConfigDialog extends JDialog {
     //Hashmap para almacenar la información del formulario
     HashMap<DefaultConfig, String> data;
     
-    public DefaultConfigDialog(JFrame father) {
+    MainApp father;
+    boolean update_path;
+    
+    public DefaultConfigDialog(MainApp father) {
     	//ventana modal
-    	super(father,true);
+    	super((JFrame)father,true);
+    	this.father = father;
     	data = new HashMap<DefaultConfig, String>();
+    	update_path=false;
         initUI();     
     }
     
@@ -129,9 +136,16 @@ public class DefaultConfigDialog extends JDialog {
             		return;
             	}
             	
+            	File fichero = new File(tfDirPath.getText());	
+            	if(!fichero.isDirectory()){
+            		JOptionPane.showMessageDialog(basic, "Dir_Path must be a directory!",
+	                        "Error", JOptionPane.ERROR_MESSAGE);
+            		return;
+            	}
+            	
             	info.put("Driver", "org.postgresql.Driver");
             	info.put("Url","jdbc:postgresql://"+tfDBipaddr.getText()+
-            			":5432/"+tfDBname.getText());
+            			"/"+tfDBname.getText());
             	info.put("UserName", tfDBuser.getText());
             	info.put("Password", tfDBpass.getText());    
 
@@ -144,30 +158,47 @@ public class DefaultConfigDialog extends JDialog {
 					else{
 						JOptionPane.showMessageDialog(basic, "Database connection failed!",
 		                        "Error", JOptionPane.ERROR_MESSAGE);
+						return;
 					}
 				} catch (SQLException e1) {
 					JOptionPane.showMessageDialog(basic, "Database connection failed!\n" +
 							e1.getMessage(),
 	                        "Error", JOptionPane.ERROR_MESSAGE);
+					return;
 					//e1.printStackTrace();
 				} catch (ClassNotFoundException e1) {
 					System.out.println("Database Driver not found");
 					e1.printStackTrace();			
 				}
 				
+				File f = new File(MainApp.POSTGRES_PROPERTIES_PATH);
+				if (f.exists()){
+					f.delete();
+				}
 				Parser.writeConfiguration(info);
-				insertDirPathToDB(tfDirPath.getText());
+				if(father.getDefaulConfig()==false)
+					insertDirPathToDB(tfDirPath.getText());
+				else{
+					if(MainApp.getDIR_PATH().compareTo(tfDirPath.getText())!=0){
+						updateDirPathInDB(tfDirPath.getText());
+					}else{
+						update_path=false;
+					}
+				}
 				dispose();
-				
             }
         });
         
         close.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-            	JOptionPane.showMessageDialog(basic, "The application will close!" +
-            			"\nYou must load default configuration values.",
-                        "Information", JOptionPane.INFORMATION_MESSAGE);
-            	System.exit(ABORT);
+            	if(father.getDefaulConfig()==false){
+	            	JOptionPane.showMessageDialog(basic, "The application will close!" +
+	            			"\nYou must load default configuration values.",
+	                        "Information", JOptionPane.INFORMATION_MESSAGE);
+	            	System.exit(ABORT);
+            	}
+            	update_path=false;
+            	dispose();
             }
 
         });
@@ -205,6 +236,25 @@ public class DefaultConfigDialog extends JDialog {
     	return true;
     }
     
+    public boolean updateDirPathInDB(String dirPath){
+    	DBInterface db = null;
+    	try{		
+    		Connection conPostgres = Conector.connectByFile(MainApp.POSTGRES_PROPERTIES_PATH);
+    		db = new DBInterface(conPostgres);
+    		db.deleteSysVar("name=\'DIR_PATH\'");
+    		db.insertSysVarObj(new SysVar("DIR_PATH", dirPath)); 
+    		MainApp.setDIR_PATH(dirPath);
+    		update_path=true;
+    	} catch (ClassNotFoundException e) {
+    		System.out.println("Database Driver not found");
+    		e.printStackTrace();
+    	} catch (SQLException e) {
+    		System.out.println("No se pudo conectar" + e.getMessage());
+    		e.printStackTrace();
+    	}
+    	return true;
+    }
+    
     public String emptyFields(){
 		
     	if(tfDBipaddr.getText().trim().length()==0){
@@ -224,6 +274,29 @@ public class DefaultConfigDialog extends JDialog {
     	}
     	return null;
     	
+    }
+    
+    public void cleanFields(){
+    	tfDBipaddr.setText("");
+    	tfDBname.setText("");
+        tfDBuser.setText("");
+        tfDBpass.setText("");
+        tfDirPath.setText("");
+    }
+    
+    public void loadFields(){
+    	Properties prop = Parser.readConfiguration();
+    	String[] strList = prop.getProperty("Url").split("//");
+    	String[] data = strList[1].split("/");
+    	tfDBipaddr.setText(data[0]);
+    	tfDBname.setText(data[1]);
+    	tfDBuser.setText(prop.getProperty("UserName"));
+    	tfDBpass.setText(prop.getProperty("Password"));
+    	tfDirPath.setText(MainApp.getDIR_PATH());
+    }
+    
+    public boolean getUpdatePath(){
+    	return update_path;
     }
     
 }

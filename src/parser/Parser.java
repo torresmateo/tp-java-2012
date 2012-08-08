@@ -60,6 +60,18 @@ public class Parser{
 		}
 	}
 	
+	public static Properties readConfiguration(){		
+		InputStream is = null;
+		Properties prop = new Properties();
+		try {
+			is = new FileInputStream(MainApp.POSTGRES_PROPERTIES_PATH);
+			prop.load(is);
+		} catch (IOException ioException) {
+			ioException.printStackTrace();
+		}
+		return prop;
+	}
+	
 	public static void writeConfiguration(Hashtable<String, String> info){
 		Properties prop = new Properties();
 		try {

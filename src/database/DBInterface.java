@@ -23,8 +23,7 @@ public class DBInterface {
 	public static void main(String[] args){
 		DBInterface db = null;
 		try{
-			Drivers.cargarDrivers();
-			Connection conPostgres = Conexiones.obtenerConexion(Conexiones.DBMS_TYPE_POSTGRES);
+			Connection conPostgres = Conector.connectByFile("src/postgres.properties");
 			db = new DBInterface(conPostgres);
 		
 			ResultSet rs = db.selectAllBitacora();
@@ -43,9 +42,23 @@ public class DBInterface {
 				System.out.println(itr.next());
 			}
 			
-			//Bitacora myBitacora = new Bitacora("arsis","ip de arsis",50,"torresmateo@gmail.com","a","2012-08-06 19:45:51");
+			/*Bitacora myBitacora = new Bitacora("arsis","ip de arsis",50,"torresmateo@gmail.com","a","2012-08-06 19:45:51");
 			
-			//db.insertBitacoraObj(myBitacora);
+			db.insertBitacoraObj(myBitacora);*/
+			/*
+			SysVar sv = new SysVar("DIR_PATH", "Hello");
+			db.insertSysVarObj(sv);*/
+			
+			/*
+			ResultSet rs = db.selectSysVar("name=\'DIR_PATH\'");
+			while (rs.next()) {
+				System.out.println("id " + rs.getString("id_sys_vars"));
+				System.out.println("name " + rs.getString("name"));
+				System.out.println("value " + rs.getString("value"));
+				
+				System.out.println("--- --- ---");
+			}
+			
 			
 		} catch (ClassNotFoundException e) {
 			System.out.println("No se encontro el driver");
