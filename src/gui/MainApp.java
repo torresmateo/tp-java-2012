@@ -19,8 +19,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
@@ -356,13 +354,15 @@ public class MainApp extends JFrame {
                 	searchEmailAlertDialog.setVisible(true);
                 	
                 	try{
-                		Connection conPostgres = Conexiones.obtenerConexion(Conexiones.DBMS_TYPE_POSTGRES);
+                		Connection conPostgres = Conector.connectByFile(POSTGRES_PROPERTIES_PATH);
             			DBInterface db = new DBInterface(conPostgres);
             			alertsTableModel.setModel(db.selectBitacoraObj(searchEmailAlertDialog.getWhereParameters()));
                 	} catch (SQLException ex) {
             			System.out.println("No se pudo conectar" + ex.getMessage());
             			ex.printStackTrace();
-            		}
+            		} catch (ClassNotFoundException e) {
+						e.printStackTrace();
+					}
                 	alertsTableModel.fireTableChanged(null);
                 }
     		});
