@@ -5,7 +5,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Iterator;
 /**
@@ -20,7 +19,7 @@ public class DBInterface {
 	public DBInterface(Connection conn){
 		this.conn = conn;
 	}
-	
+	/*
 	public static void main(String[] args){
 		DBInterface db = null;
 		try{
@@ -57,7 +56,7 @@ public class DBInterface {
 		}
 		
 		
-	}
+	}*/
 	//========================================================================
 	//						Bitacora
 	//========================================================================
@@ -181,7 +180,7 @@ public class DBInterface {
 	
 	//********************************** inertSysVarObj **********************************
 	
-	public void inertSysVarObj(SysVar newEntry) throws SQLException{
+	public void insertSysVarObj(SysVar newEntry) throws SQLException{
 		String sql = "insert into sys_vars (name,value) values(?,?)";
 		PreparedStatement pstmt = conn.prepareStatement(sql);
 		pstmt.setString(1, newEntry.getName());
