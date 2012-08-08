@@ -55,10 +55,9 @@ public class MainApp extends JFrame {
 	 * conectarnos a la Base de Datos
 	 */
 	public static final String POSTGRES_PROPERTIES_PATH = "src/postgres.properties";
-	private static String DIR_PATH;
+	public static String DIR_PATH;
 	
 	static Logger logger = Logger.getLogger(ServerMonitor.class);
-	
 	
 	JPanel basic;         //panel principal de la App
 	JTabbedPane tabpanel; //panel de tabs de la App
@@ -72,7 +71,6 @@ public class MainApp extends JFrame {
 	JTree tree;           //tree de los servers
 	DefaultMutableTreeNode root; //nodo raiz tree
 	DefaultTreeModel model; //modelo de datos del tree
-	Hashtable<String, Object> htTree; //Hashtable para el Tree de los servers
 	Hashtable<String, Properties> serverData; 
 	//Hashtable paralelo al Tree, para pasar datos a EditDialog 
 	
@@ -92,6 +90,9 @@ public class MainApp extends JFrame {
     public static String getDIR_PATH() {
 		return DIR_PATH;
 	}
+    public static void setDIR_PATH(String dirPath) {
+		DIR_PATH = dirPath;
+	}
 	public MainApp() {
 		
 		ConfigDialog = new DefaultConfigDialog(this);
@@ -101,10 +102,10 @@ public class MainApp extends JFrame {
 		
 		File fichero = new File(MainApp.POSTGRES_PROPERTIES_PATH);		
 		if(!fichero.exists()){
-			defaultConfig=false;
+			defaultConfig=false; //first time
 			this.configButton.doClick();
-			defaultConfig=true;
 		}
+		defaultConfig=true;
 
 		PropertyConfigurator.configure("src/log4j.properties");
 		logger.debug("Iniciada la Ejecucion del Programa");
@@ -118,7 +119,7 @@ public class MainApp extends JFrame {
     		System.out.println("Database Driver not found");
     		e.printStackTrace();
     	} catch (SQLException e) {
-    		System.out.println("No se pudo conectar" + e.getMessage());
+    		System.out.println("Can not connect to database" + e.getMessage());
     		e.printStackTrace();
     	}
     	
@@ -193,27 +194,11 @@ public class MainApp extends JFrame {
     public JPanel createServerPanel() {
 		JPanel serverPanel = new JPanel(new BorderLayout());
 		
-		root = new DefaultMutableTreeNode("Servers");
-		model = new DefaultTreeModel(root);
-		htTree = new Hashtable<String, Object>();
-		
-		// Listar los archivos de la carpeta de configuración
-		Directory dir = new Directory(MainApp.DIR_PATH);
-		// Array de los archivos de configuración de los servidores
-		File servers_file[] = dir.list();	
-		
-		// Leer los datos de cada archivo de configuración
-		for (int i = 0; i < servers_file.length; i++) {
-			Parser p = new Parser(servers_file[i].getAbsolutePath());
-			serverData.put(servers_file[i].getName(),p.readProperties());
-			htTree.put(servers_file[i].getName(),propertiesToStringArray(p.readProperties()));
-			//TODO iniciar el hilo de monitor de este server
-			ServerMonitor serverCheck = new ServerMonitor(p.readProperties());
-			serverCheck.start();
-		} 
-		
-		JTree.DynamicUtilTreeNode.createChildren(root, htTree);
+		model = new DefaultTreeModel(null);
 		tree = new JTree(model);
+		
+		readServerFiles();
+		
 		tree.getSelectionModel().setSelectionMode
           (TreeSelectionModel.SINGLE_TREE_SELECTION);
 
@@ -223,6 +208,31 @@ public class MainApp extends JFrame {
 		return serverPanel;
 	}
     
+    public void readServerFiles(){
+    	Hashtable<String, Object> htTree = new Hashtable<String, Object>();
+    	
+    	root = new DefaultMutableTreeNode("Servers");
+    	// Listar los archivos de la carpeta de configuración
+		Directory dir = new Directory(MainApp.DIR_PATH);
+		// Array de los archivos de configuración de los servidores
+		File servers_file[] = dir.list();	
+		
+		if(servers_file!=null){	//si existen archivos .properties
+			// Leer los datos de cada archivo de configuración
+			for (int i = 0; i < servers_file.length; i++) {
+				Parser p = new Parser(servers_file[i].getAbsolutePath());
+				serverData.put(servers_file[i].getName(),p.readProperties());
+				htTree.put(servers_file[i].getName(),propertiesToStringArray(p.readProperties()));
+				//TODO iniciar el hilo de monitor de este server
+				ServerMonitor server = new ServerMonitor(p.readProperties());
+				server.start();
+			} 
+		}
+		
+		JTree.DynamicUtilTreeNode.createChildren(root, htTree);
+		
+		 ((DefaultTreeModel) tree.getModel()).setRoot(root);
+    }
     
     /*
      * Listeners
@@ -237,15 +247,12 @@ public class MainApp extends JFrame {
 			 if (lastSelectedNode == null || lastSelectedNode.isRoot()){
 				 lastSelectedServerName = null;
 				 return;
-			 }
-			 
+			 }		 
 			 if(lastSelectedNode.isLeaf()){
 				 lastSelectedServerName = lastSelectedNode.getParent().toString();
-				// System.out.println(node.getParent().toString());
 			 }
 			 else{
 				 lastSelectedServerName = lastSelectedNode.toString();
-				// System.out.println(node.toString()); 
 			 }	 
 		}
     }
@@ -341,10 +348,17 @@ public class MainApp extends JFrame {
     
     class ConfigButtonListener implements ActionListener{
    	 public void actionPerformed(ActionEvent event) {
-   		 ConfigDialog.setVisible(true);
-         //como es modal, al llegar aquí es porque se ha cerrado la
-         //ventana
-        }
+	   		 if(defaultConfig==true) ConfigDialog.loadFields();
+	   		 ConfigDialog.setVisible(true);
+	         //como es modal, al llegar aquí es porque se ha cerrado la
+	         //ventana
+	   		if(defaultConfig==true){
+		   		 if(ConfigDialog.getUpdatePath()){
+		   			 readServerFiles();
+		   		    ((DefaultTreeModel) tree.getModel()).reload();
+		   		 }
+	   		}	  
+       }
    }
     
     class ExitButtonListener implements ActionListener{
@@ -385,7 +399,6 @@ public class MainApp extends JFrame {
     
     public String[] propertiesToStringArray(Properties prop){
     	String[] StringProp = new String[13];
-    	//StringBuffer sb = new StringBuffer(""); TODO ver porque esto no se usa o borrar
     	int i=0;
     	for (Enumeration<Object> e = prop.keys(); e.hasMoreElements();) {
 			Object obj = e.nextElement();
