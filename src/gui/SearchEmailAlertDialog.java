@@ -87,22 +87,22 @@ public class SearchEmailAlertDialog extends JDialog{
 		formPanel.add(new JLabel("Alias:"));
 		formPanel.add(tfAlias);
 		
-		formPanel.add(new JLabel("Addres:"));
+		formPanel.add(new JLabel("Address:"));
 		formPanel.add(tfAddress);
 	   
-		formPanel.add(new JLabel("Puerto:"));
+		formPanel.add(new JLabel("Port:"));
 		formPanel.add(tfPuerto);
 	    
 		formPanel.add(new JLabel("E-mail:")); 
 		formPanel.add(tfEmail);
 	    
-		formPanel.add(new JLabel("Estado:")); 
+		formPanel.add(new JLabel("Status:")); 
 		formPanel.add(tfEstado);
 	    
-		formPanel.add(new JLabel("Fecha Inicial:"));
+		formPanel.add(new JLabel("Init Time:"));
 		formPanel.add(tfFechaInicial);
 	    
-		formPanel.add(new JLabel("Fecha Final:")); 
+		formPanel.add(new JLabel("End Time:")); 
 		formPanel.add(tfFechaFinal);
 		
 		basic.add(formPanel);

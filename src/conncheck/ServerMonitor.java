@@ -58,7 +58,6 @@ public class ServerMonitor extends Thread{
 		
 		MonitorEMail mail = new MonitorEMail();
 		mail.addRecipient(targetMail);
-		mail.addRecipient("minardifer@gmail.com");//te va a llegar el spam de la vida :)
 		
 		String mailBody = "";
 		ConnectionChecker currentConnection;
