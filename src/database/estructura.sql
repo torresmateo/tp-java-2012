@@ -34,7 +34,7 @@ ALTER TABLE "sys_vars_id_sys_vars_seq" OWNER TO "postgres";
 -- ----------------------------
 DROP TABLE IF EXISTS "sys_vars";
 CREATE TABLE "sys_vars" (
-	"id_sys_vars" int8 NOT NULL,
+	"id_sys_vars" int8 NOT NULL DEFAULT nextval('sys_vars_id_sys_vars_seq'::regclass),
 	"name" varchar NOT NULL,
 	"value" varchar NOT NULL
 )
