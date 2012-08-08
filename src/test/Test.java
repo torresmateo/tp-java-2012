@@ -21,7 +21,7 @@ public class Test {
 		
 		DBInterface db = null;
 		try{
-			Connection conPostgres = Conector.conectar(POSTGRES_PROPERTIES_PATH);
+			Connection conPostgres = Conector.connectByFile(POSTGRES_PROPERTIES_PATH);
 			db = new DBInterface(conPostgres);
 		
 			ResultSet rs = db.selectAllBitacora();

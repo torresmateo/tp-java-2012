@@ -14,7 +14,10 @@ public class Directory {
 	
 	public File[] list(){
 		File file = new File(this.DIR_PATH);
-		File files[] = file.listFiles();
-		return files;
+		if(file.exists()){
+			File files[] = file.listFiles();
+			return files;
+		}
+		return null;
 	}
 }

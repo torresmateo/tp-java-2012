@@ -79,29 +79,38 @@ public class MainApp extends JFrame {
 	JToolBar toolbar;     //toolbar de la App
 	AddServerDialog AddDialog; //Ventana de dialogo para agregar server
 	EditServerDialog EditDialog; //Ventana de dialogo de editar server
+	DefaultConfigDialog ConfigDialog; //Ventana de dialogo de editar server
 	
+	JButton configButton;
+	
+	boolean defaultConfig;
 
     public static String getDIR_PATH() {
 		return DIR_PATH;
 	}
-
-
 	public MainApp() {
+		
+		ConfigDialog = new DefaultConfigDialog(this);
+		ImageIcon configIcon = new ImageIcon(getClass().getResource("config.png"));
+		configButton = new JButton(configIcon);
+		configButton.addActionListener(new ConfigButtonListener());
+		
+		File fichero = new File(MainApp.POSTGRES_PROPERTIES_PATH);		
+		if(!fichero.exists()){
+			defaultConfig=false;
+			this.configButton.doClick();
+			defaultConfig=true;
+		}
 		PropertyConfigurator.configure("src/log4j.properties");
 		logger.debug("Iniciada la Ejecucion del Programa");
     	DBInterface db = null;
     	try{		
-    		Connection conPostgres = Conector.conectar(POSTGRES_PROPERTIES_PATH);
+    		Connection conPostgres = Conector.connectByFile(POSTGRES_PROPERTIES_PATH);
     		db = new DBInterface(conPostgres);
     		ArrayList<SysVar> sv = db.selectSysVarObjByName("DIR_PATH");
-    		if(!sv.isEmpty())
-    			MainApp.DIR_PATH = sv.get(0).getValue();
-    		else{
-    			System.err.println("No se encontro la variable DIR_PATH en la base de datos");
-    			System.exit(ABORT);
-    		}
+    		MainApp.DIR_PATH = sv.get(0).getValue();
     	} catch (ClassNotFoundException e) {
-    		System.out.println("No se encontro el driver");
+    		System.out.println("Database Driver not found");
     		e.printStackTrace();
     	} catch (SQLException e) {
     		System.out.println("No se pudo conectar" + e.getMessage());
@@ -117,7 +126,7 @@ public class MainApp extends JFrame {
     public final void initUI() {
     	logger.debug("Iniciado el dibujado de la interfaz");
     	basic = new JPanel(new BorderLayout());
-    	
+
     	//Panel de Tabs
     	tabpanel = new JTabbedPane();
     	//Server tab
@@ -134,17 +143,15 @@ public class MainApp extends JFrame {
         ImageIcon addIcon = new ImageIcon(getClass().getResource("add.png"));
         ImageIcon editIcon = new ImageIcon(getClass().getResource("edit.png"));
         ImageIcon deleteIcon = new ImageIcon(getClass().getResource("delete.png"));
-        ImageIcon configIcon = new ImageIcon(getClass().getResource("config.png"));
         ImageIcon exitIcon = new ImageIcon(getClass().getResource("exit2.png"));
         
         JButton addButton = new JButton(addIcon);
         addButton.setToolTipText("Add server configuration");
         JButton editButton = new JButton(editIcon);
-        addButton.setToolTipText("Edit server configuration");
+        editButton.setToolTipText("Edit server configuration");
         JButton deleteButton = new JButton(deleteIcon);
-        addButton.setToolTipText("Delete server configuration");
-        JButton configButton = new JButton(configIcon);
-        addButton.setToolTipText("Configure program parameters");
+        deleteButton.setToolTipText("Delete server configuration");
+        configButton.setToolTipText("Configure program parameters");
         JButton exitButton = new JButton(exitIcon);
         exitButton.setToolTipText("Exit from program");
              
@@ -186,7 +193,8 @@ public class MainApp extends JFrame {
 		// Listar los archivos de la carpeta de configuración
 		Directory dir = new Directory(MainApp.DIR_PATH);
 		// Array de los archivos de configuración de los servidores
-		File servers_file[] = dir.list();		
+		File servers_file[] = dir.list();	
+		
 		// Leer los datos de cada archivo de configuración
 		for (int i = 0; i < servers_file.length; i++) {
 			Parser p = new Parser(servers_file[i].getAbsolutePath());
@@ -324,6 +332,14 @@ public class MainApp extends JFrame {
        }
     }
     
+    class ConfigButtonListener implements ActionListener{
+   	 public void actionPerformed(ActionEvent event) {
+   		 ConfigDialog.setVisible(true);
+         //como es modal, al llegar aquí es porque se ha cerrado la
+         //ventana
+        }
+   }
+    
     class ExitButtonListener implements ActionListener{
     	 public void actionPerformed(ActionEvent event) {
          	int opt = JOptionPane.showConfirmDialog(basic,"Are you sure to quit?",
@@ -375,7 +391,7 @@ public class MainApp extends JFrame {
 		
 		DBInterface db = null;
 		try{
-			Connection conPostgres = Conector.conectar(POSTGRES_PROPERTIES_PATH);
+			Connection conPostgres = Conector.connectByFile(POSTGRES_PROPERTIES_PATH);
     		db = new DBInterface(conPostgres);
 			emailTable = new JTable(new AlertsTableModel(db.selectAllBitacoraObj()));
 		} catch (ClassNotFoundException e) {
@@ -399,6 +415,10 @@ public class MainApp extends JFrame {
     /*
      * Funciones para comunicarse con JDialog
      */
+    
+    public boolean getDefaulConfig(){
+    	return defaultConfig;
+    }
     
     public String getLastSelectedServerName(){
     	return lastSelectedServerName;
