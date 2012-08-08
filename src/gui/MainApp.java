@@ -54,7 +54,7 @@ public class MainApp extends JFrame {
 	 * La ruta hasta el archivo .properties que contiene los datos para
 	 * conectarnos a la Base de Datos
 	 */
-	public static final String POSTGRES_PROPERTIES_PATH = "src/postgres.properties";
+	public static final String POSTGRES_PROPERTIES_PATH = "src/postgres.properties2";
 	public static String DIR_PATH;
 	
 	static Logger logger = Logger.getLogger(ServerMonitor.class);
