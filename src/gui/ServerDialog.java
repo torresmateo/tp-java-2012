@@ -158,6 +158,51 @@ public class ServerDialog extends JDialog{
           tftolerance.setText("");
     }
     
+    public String emptyFields(){
+		
+    	if(tfaddress.getText().trim().length()==0){
+    		return new String("Complete server address");
+    	}
+    	if(tfalias.getText().trim().length()==0){
+    		return new String("Complete server alias");
+    	}
+    	if(tfcheckint.getText().trim().length()==0){
+    		return new String("Complete check interval");
+    	}
+    	if(tfcurrentstate.getText().trim().length()==0){
+    		return new String("Complete current state");
+    	}
+    	if(tfemailnotif.getText().trim().length()==0){
+    		return new String("Complete email notification");
+    	}
+    	if(tfhostname.getText().trim().length()==0){
+    		return new String("Complete hostname");
+    	}
+    	if(tflastcheck.getText().trim().length()==0){
+    		return new String("Complete last check");
+    	}
+    	if(tflastnotif.getText().trim().length()==0){
+    		return new String("Complete last notification");
+    	}
+    	if(tfmaxcheckattempts.getText().trim().length()==0){
+    		return new String("Complete max check attempts");
+    	}
+    	if(tfnotifinterval.getText().trim().length()==0){
+    		return new String("Complete notification interval");
+    	}
+    	if(tfportslist.getText().trim().length()==0){
+    		return new String("Complete ports list");
+    	}
+    	if(tfretryint.getText().trim().length()==0){
+    		return new String("Complete retry interval");
+    	}
+    	if(tftolerance.getText().trim().length()==0){
+    		return new String("Complete tolerance attempts");
+    	}
+    	return null;
+    	
+    }
+    
     /*
      * Funciones para comunicación con ventana padre
      */

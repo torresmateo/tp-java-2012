@@ -66,6 +66,12 @@ public class EditServerDialog extends ServerDialog{
         
         update.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+            	String msg;
+            	if((msg=emptyFields())!=null){
+            		JOptionPane.showMessageDialog(basic, msg,
+	                        "Error", JOptionPane.ERROR_MESSAGE);
+            		return;
+            	}
             	data.put(ServerProperties.ADDRESS,tfaddress.getText());
             	data.put(ServerProperties.ALIAS,tfalias.getText());
             	data.put(ServerProperties.CHECK_INTERVAL,tfcheckint.getText());

@@ -237,6 +237,29 @@ public class MainApp extends JFrame {
 		 ((DefaultTreeModel) tree.getModel()).setRoot(root);
     }
     
+    public void readServerFilesWithoutServerMonitorCall(){
+    	Hashtable<String, Object> htTree = new Hashtable<String, Object>();
+    	
+    	root = new DefaultMutableTreeNode("Servers");
+    	// Listar los archivos de la carpeta de configuración
+		Directory dir = new Directory(MainApp.DIR_PATH);
+		// Array de los archivos de configuración de los servidores
+		File servers_file[] = dir.list();	
+		
+		if(servers_file!=null){	//si existen archivos .properties
+			// Leer los datos de cada archivo de configuración
+			for (int i = 0; i < servers_file.length; i++) {
+				Parser p = new Parser(servers_file[i].getAbsolutePath());
+				serverData.put(servers_file[i].getName(),p.readProperties());
+				htTree.put(servers_file[i].getName(),propertiesToStringArray(p.readProperties()));
+			} 
+		}
+		
+		JTree.DynamicUtilTreeNode.createChildren(root, htTree);
+		
+		 ((DefaultTreeModel) tree.getModel()).setRoot(root);
+    }
+    
     /*
      * Listeners
      */
