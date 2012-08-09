@@ -226,7 +226,7 @@ public class MainApp extends JFrame {
 				Parser p = new Parser(servers_file[i].getAbsolutePath());
 				serverData.put(servers_file[i].getName(),p.readProperties());
 				htTree.put(servers_file[i].getName(),propertiesToStringArray(p.readProperties()));
-				ServerMonitor server = new ServerMonitor(p.readProperties());
+				ServerMonitor server = new ServerMonitor(p.readProperties(),this);
 				server.start();
 				serverList.add(server);//guardamos el server monitor recen creado en la lista de servers
 			} 
@@ -376,11 +376,16 @@ public class MainApp extends JFrame {
 	   		if(defaultConfig==true){
 		   		 if(ConfigDialog.getUpdatePath()){
 		   			 readServerFiles();
-		   		    ((DefaultTreeModel) tree.getModel()).reload();
+		   		     refreshTreeModel();
 		   		 }
 	   		}	  
        }
    }
+    
+    public void refreshTreeModel(){
+    	 ((DefaultTreeModel) tree.getModel()).reload();
+    	 
+    }
     
     class ExitButtonListener implements ActionListener{
     	 public void actionPerformed(ActionEvent event) {
@@ -438,10 +443,10 @@ public class MainApp extends JFrame {
     	    propertiesToStringArray(sdialog.newServerProp()));
     	 serverData.put(sdialog.newServerName(), sdialog.newServerProp());
     	 JTree.DynamicUtilTreeNode.createChildren(root,ht);
-    	 ((DefaultTreeModel) tree.getModel()).reload();
-    	ServerMonitor server = new ServerMonitor(sdialog.newServerProp());
-		server.start();
-		serverList.add(server);//guardamos el server monitor recen creado en la lista de servers
+    	 refreshTreeModel();
+    	 ServerMonitor server = new ServerMonitor(sdialog.newServerProp(),this);
+		 server.start();
+		 serverList.add(server);//guardamos el server monitor recen creado en la lista de servers
 	}
     
     /*
