@@ -13,7 +13,7 @@ public class FileManager {
 	 * Crea el archivo de configuración
 	 */
 	
-	public static boolean save(HashMap<ServerProperties, String> data){
+	public static synchronized boolean save(HashMap<ServerProperties, String> data){
 		//El archivo a ser creado lleva el nombre de alias.properties
 		String server_file = data.get(ServerProperties.ALIAS)+".properties";	
 
@@ -32,7 +32,7 @@ public class FileManager {
 	 * @param data Data for update
 	 */
 	
-	public static boolean update(String fileName, HashMap<ServerProperties, String> data){
+	public static synchronized boolean update(String fileName, HashMap<ServerProperties, String> data){
 		String server_file = data.get(ServerProperties.ALIAS)+".properties";
 		if(fileName.compareTo(server_file)!=0){
 			if(exists(server_file))
