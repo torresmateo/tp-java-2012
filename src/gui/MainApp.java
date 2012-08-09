@@ -9,6 +9,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.Properties;
 
 import javax.swing.ImageIcon;
@@ -54,6 +55,8 @@ public class MainApp extends JFrame {
 	 * La ruta hasta el archivo .properties que contiene los datos para
 	 * conectarnos a la Base de Datos
 	 */
+	private ArrayList<ServerMonitor> serverList = new ArrayList<ServerMonitor>();
+	
 	public static final String POSTGRES_PROPERTIES_PATH = "src/postgres.properties2";
 	public static String DIR_PATH;
 	
@@ -225,6 +228,7 @@ public class MainApp extends JFrame {
 				htTree.put(servers_file[i].getName(),propertiesToStringArray(p.readProperties()));
 				ServerMonitor server = new ServerMonitor(p.readProperties());
 				server.start();
+				serverList.add(server);//guardamos el server monitor recen creado en la lista de servers
 			} 
 		}
 		
@@ -272,6 +276,21 @@ public class MainApp extends JFrame {
         }
     }
     
+    public void removeServerMonitor(String lastServerName){
+    	ServerMonitor deleteServer = null;
+		 Iterator<ServerMonitor> itr = serverList.iterator();
+		 while(itr.hasNext()){
+			 ServerMonitor currentServer = itr.next();
+			 Properties serverInfo = currentServer.getServerInfo();
+			 String serverName = serverInfo.getProperty("alias") + ".properties";
+			 if(serverName.compareTo(lastServerName) == 0){
+				 deleteServer = currentServer;
+				 currentServer.setDie(true);
+			 }
+		 }
+		 serverList.remove(deleteServer);
+	}
+    
     class EditButtonListener implements ActionListener{
     	 public void actionPerformed(ActionEvent event) {
         	 SwingUtilities.invokeLater(new Runnable() {
@@ -294,6 +313,7 @@ public class MainApp extends JFrame {
                      //ventana
                      if(EditDialog.newServerProp()!=null){         
                     	 //cargar nuevo server file properties
+                    	 removeServerMonitor(lastSelectedServerName);
                     	 if(lastSelectedNode.isLeaf()){
                     		 ((DefaultTreeModel) tree.getModel()).
                         	 removeNodeFromParent((MutableTreeNode) lastSelectedNode.getParent()); 	
@@ -331,7 +351,8 @@ public class MainApp extends JFrame {
 	               	 if(opt==0){
 	               		 serverData.remove(getLastSelectedServerName());
 	               		 FileManager.remove(getLastSelectedServerName());
-	               		 if(lastSelectedNode.isLeaf()){
+	               		 removeServerMonitor(lastSelectedServerName);
+	                   	 if(lastSelectedNode.isLeaf()){
 	                   		 ((DefaultTreeModel) tree.getModel()).
 	                       	 removeNodeFromParent((MutableTreeNode) lastSelectedNode.getParent()); 	
 	               		 }
@@ -339,6 +360,7 @@ public class MainApp extends JFrame {
 	               			 ((DefaultTreeModel) tree.getModel()).
 	                       	 removeNodeFromParent(lastSelectedNode);
 	               		 }
+	               		
 	               	 }
                 }
             });
@@ -417,10 +439,10 @@ public class MainApp extends JFrame {
     	 serverData.put(sdialog.newServerName(), sdialog.newServerProp());
     	 JTree.DynamicUtilTreeNode.createChildren(root,ht);
     	 ((DefaultTreeModel) tree.getModel()).reload();
-    	 
-    	 //TODO iniciar hilo de monitor para este server
-    	 // hay que pasarle las propiedades dialog.newServerProp()
-    }
+    	ServerMonitor server = new ServerMonitor(sdialog.newServerProp());
+		server.start();
+		serverList.add(server);//guardamos el server monitor recen creado en la lista de servers
+	}
     
     /*
      * Creacion del panel de la Tabla de email

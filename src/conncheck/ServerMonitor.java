@@ -37,6 +37,10 @@ public class ServerMonitor extends Thread{
 		this.die = die;
 	}
 
+	public Properties getServerInfo() {
+		return serverInfo;
+	}
+
 	public ServerMonitor(Properties serverInfo){
 		this.serverInfo = serverInfo;
 	}
@@ -206,6 +210,11 @@ public class ServerMonitor extends Thread{
 			returnArray.add(new ConnectionChecker(address, Integer.parseInt(strList[i])));
 		}
 		return returnArray;
+	}
+
+	@Override
+	public String toString() {
+		return "ServerMonitor [serverInfo=" + serverInfo + ", die=" + die + "]";
 	}
 	
 
