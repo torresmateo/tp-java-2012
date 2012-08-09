@@ -15,6 +15,7 @@ import java.util.Properties;
 import org.apache.log4j.Logger;
 
 
+import conncheck.ConnectionChecker;
 import conncheck.ServerMonitor;
 import database.Conector;
 import database.ConnectionStatus;
@@ -95,7 +96,38 @@ public class MonthlyReport extends Thread{
 	}
 	
 	String generateStatistics(Properties serverInfo){
-		return "cada un anho explota la nutria!!";
+		
+		String statisticsString = new String();
+		ArrayList<ConnectionStatus> connectionStatusTable;
+		String address = serverInfo.getProperty("address");
+		String[] strList = serverInfo.getProperty("ports").split(",");
+		
+		Connection conPostgres = null;
+		try{
+			conPostgres = Conector.connectByFile(MainApp.POSTGRES_PROPERTIES_PATH);
+		} catch (ClassNotFoundException e) {
+			logger.error("No se encontro el driver");
+		} catch (SQLException e) {
+			logger.error("Error SQL: " + e.getMessage() + e.getStackTrace());
+		}
+		DBInterface db = null;
+		if(conPostgres != null)
+			db = new DBInterface(conPostgres);
+		
+		
+		try{
+			for(int i=0; i < strList.length; i++){
+				connectionStatusTable = db.selectConnectionStatus(" address = '" + address + "' AND port = '" + strList[i] + "' ORDE BY date ");
+				//TODO descomentar
+				//statisticsString += generateUptimeStatistics(connectionStatusTable);
+			}
+		} catch (SQLException e) {
+			logger.error("Error SQL: " + e.getMessage() + e.getStackTrace());
+		}
+		
+		
+		
+		return statisticsString;
 	}
 	
 	void sendMonthlyEmail(ServerMonitor currentServer){
