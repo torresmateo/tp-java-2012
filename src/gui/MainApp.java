@@ -407,7 +407,6 @@ public class MainApp extends JFrame {
     
     public void refreshTreeModel(){
     	 ((DefaultTreeModel) tree.getModel()).reload();
-    	 
     }
     
     class ExitButtonListener implements ActionListener{
