@@ -217,4 +217,55 @@ public class DBInterface {
 		Statement stmt = conn.createStatement();
 		stmt.executeUpdate(sql);
 	}
+	
+	//========================================================================
+	//						Connection Status
+	//========================================================================
+		
+	public ArrayList<ConnectionStatus> selectAllConnectionStatus() throws SQLException{
+		ArrayList<ConnectionStatus> returnArray = new ArrayList<ConnectionStatus>();
+		String sql = "select * from connection_status ";
+		Statement stmt = conn.createStatement();
+		ResultSet rs = stmt.executeQuery(sql);
+		while(rs.next()){
+			returnArray.add(new ConnectionStatus(
+					rs.getString("address"), 
+					rs.getInt("port"), 
+					rs.getString("satus"), 
+					rs.getTimestamp("date") ));
+		}
+		return returnArray;
+	}
+	
+	public ArrayList<ConnectionStatus> selectConnectionStatus(String where) throws SQLException{
+		ArrayList<ConnectionStatus> returnArray = new ArrayList<ConnectionStatus>();
+		String sql = "select * from connection_status where " + where;
+		Statement stmt = conn.createStatement();
+		ResultSet rs = stmt.executeQuery(sql);
+		while(rs.next()){
+			returnArray.add(new ConnectionStatus(
+					rs.getString("address"), 
+					rs.getInt("port"), 
+					rs.getString("satus"), 
+					rs.getTimestamp("date") ));
+		}
+		return returnArray;
+	}
+	
+	public void insertConnectionStatus(ConnectionStatus newEntry) throws SQLException{
+		String sql = "insert into connection_status (address,port,status,date) values(?,?,?,?)";
+		PreparedStatement pstmt = conn.prepareStatement(sql);
+		pstmt.setString(1, newEntry.getAddress());
+		pstmt.setInt(2, newEntry.getPort());
+		pstmt.setString(3, newEntry.getStatus());
+		pstmt.setTimestamp(4, newEntry.getDate());
+		pstmt.executeUpdate();
+	}
+	
+	public void deleteConnectionStatus(String where) throws SQLException{
+		String sql = "delete from connection_status where " + where;
+		Statement stmt = conn.createStatement();
+		stmt.executeUpdate(sql);
+	}
+	
 }
