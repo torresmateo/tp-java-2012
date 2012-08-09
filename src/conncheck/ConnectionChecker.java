@@ -16,6 +16,7 @@ public class ConnectionChecker {
 	private Socket socket;
 	private int port;
 	private String host;
+	private int attemptsRemainig;
 	static Logger logger = Logger.getLogger(ServerMonitor.class);
 	
 	
@@ -67,6 +68,12 @@ public class ConnectionChecker {
 	}
 	public String getHost() {
 		return host;
+	}
+	public int getAttemptsRemainig() {
+		return attemptsRemainig;
+	}
+	public void setAttemptsRemainig(int attemptsRemainig) {
+		this.attemptsRemainig = attemptsRemainig;
 	}
 	@Override
 	public String toString() {
