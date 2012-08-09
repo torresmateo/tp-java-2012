@@ -17,6 +17,7 @@ import org.apache.log4j.Logger;
 
 import conncheck.ConnectionChecker;
 import conncheck.ServerMonitor;
+import database.Bitacora;
 import database.Conector;
 import database.ConnectionStatus;
 import database.DBInterface;
@@ -55,6 +56,7 @@ public class MonthlyReport extends Thread{
 		
 		String statisticsString = new String();
 		ArrayList<ConnectionStatus> connectionStatusTable;
+		ArrayList<Bitacora> bitacoraTable;
 		String address = serverInfo.getProperty("address");
 		String[] strList = serverInfo.getProperty("ports").split(",");
 		
@@ -76,6 +78,10 @@ public class MonthlyReport extends Thread{
 				connectionStatusTable = db.selectConnectionStatus(" address = '" + address + "' AND port = '" + strList[i] + "' ORDE BY date ");
 				//TODO descomentar
 				//statisticsString += generateUptimeStatistics(connectionStatusTable);
+				
+				bitacoraTable = db.selectBitacoraObj(" direccion_ip = '" + address + "' AND puerto = '" + strList[i] + "'");
+				//TODO descomentar
+				//statisticsString += generateErrorStatistics(bitacoraTable);
 			}
 		} catch (SQLException e) {
 			logger.error("Error SQL: " + e.getMessage() + e.getStackTrace());
