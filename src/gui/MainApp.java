@@ -37,6 +37,7 @@ import conncheck.ServerMonitor;
 import database.Conector;
 import database.DBInterface;
 import database.SysVar;
+import email.MonthlyReport;
 
 
 import parser.Directory;
@@ -56,6 +57,8 @@ public class MainApp extends JFrame {
 	 * conectarnos a la Base de Datos
 	 */
 	private ArrayList<ServerMonitor> serverList = new ArrayList<ServerMonitor>();
+	private MonthlyReport mReport = new MonthlyReport(serverList);
+	
 	
 	public static final String POSTGRES_PROPERTIES_PATH = "src/postgres.properties2";
 	public static String DIR_PATH;
@@ -97,7 +100,7 @@ public class MainApp extends JFrame {
 		DIR_PATH = dirPath;
 	}
 	public MainApp() {
-		
+		mReport.start();
 		ConfigDialog = new DefaultConfigDialog(this);
 		ImageIcon configIcon = new ImageIcon(getClass().getResource("config.png"));
 		configButton = new JButton(configIcon);
@@ -229,6 +232,7 @@ public class MainApp extends JFrame {
 				ServerMonitor server = new ServerMonitor(p.readProperties(),this);
 				server.start();
 				serverList.add(server);//guardamos el server monitor recen creado en la lista de servers
+				mReport.setServerList(serverList);
 			} 
 		}
 		
@@ -312,6 +316,8 @@ public class MainApp extends JFrame {
 			 }
 		 }
 		 serverList.remove(deleteServer);
+		mReport.setServerList(serverList);
+			
 	}
     
     class EditButtonListener implements ActionListener{
@@ -469,6 +475,7 @@ public class MainApp extends JFrame {
     	 ServerMonitor server = new ServerMonitor(sdialog.newServerProp(),this);
 		 server.start();
 		 serverList.add(server);//guardamos el server monitor recen creado en la lista de servers
+		 mReport.setServerList(serverList);
 	}
     
     /*

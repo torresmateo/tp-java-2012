@@ -211,6 +211,7 @@ public class ServerMonitor extends Thread{
 				}else{
 					data.put(ServerProperties.CURRENT_STATE, "DOWN");
 				}
+				System.out.println("update desde el thread");
 				FileManager.update(data.get(ServerProperties.ALIAS)+".properties",data);
 				father.readServerFilesWithoutServerMonitorCall();
 				father.refreshTreeModel();
