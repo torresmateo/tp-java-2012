@@ -195,10 +195,11 @@ public class ServerMonitor extends Thread{
 				}
 				//TODO hacer update del .properties
 				FileManager.update(data.get(ServerProperties.ALIAS)+".properties",data);
+				father.readServerFilesWithoutServerMonitorCall();
 				father.refreshTreeModel();
 				System.out.println("==> CURRENT_STATE="+data.get(ServerProperties.CURRENT_STATE));
-				//sleep(checkInterval*60000);//esperamos la cantidad configurada de tiempo para volver a hacer el check
-				sleep(0);
+				sleep(checkInterval*60000);//esperamos la cantidad configurada de tiempo para volver a hacer el check
+				//sleep(0);
 				System.out.println("sleep de "+checkInterval+" mins");
 				System.out.println();
 			} catch (InterruptedException e) {
