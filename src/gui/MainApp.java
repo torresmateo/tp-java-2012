@@ -223,7 +223,6 @@ public class MainApp extends JFrame {
 				Parser p = new Parser(servers_file[i].getAbsolutePath());
 				serverData.put(servers_file[i].getName(),p.readProperties());
 				htTree.put(servers_file[i].getName(),propertiesToStringArray(p.readProperties()));
-				//TODO iniciar el hilo de monitor de este server
 				ServerMonitor server = new ServerMonitor(p.readProperties());
 				server.start();
 			} 
