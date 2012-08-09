@@ -2,10 +2,7 @@ package conncheck;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Date;
 import java.sql.Timestamp;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -13,6 +10,7 @@ import java.util.Properties;
 
 import database.Bitacora;
 import database.Conector;
+import database.ConnectionStatus;
 import database.DBInterface;
 import email.MonitorEMail;
 import gui.MainApp;
@@ -35,6 +33,9 @@ public class ServerMonitor extends Thread{
 	static Logger logger = Logger.getLogger(ServerMonitor.class);
 	private boolean die = false;
 	MainApp father;
+	
+	private static final int down = 0;
+	private static final int ok = 0;
 	
 	public void setDie(boolean die) {
 		this.die = die;
@@ -71,8 +72,10 @@ public class ServerMonitor extends Thread{
 		int notificationInterval = Integer.parseInt(serverInfo.get("notification_interval").toString());
 		int toleranceAttempts = Integer.parseInt(serverInfo.get("tolerance_attempts").toString());
 		
+		// hash para anotar los nuevos valores en el .properties
 		HashMap<ServerProperties, String> data = new HashMap<ServerProperties, String>();
 		
+		// Se asignan los valores que nunca cambian
 		data.put(ServerProperties.ADDRESS, serverInfo.get("address").toString());
     	data.put(ServerProperties.ALIAS, serverInfo.get("alias").toString());
     	data.put(ServerProperties.CHECK_INTERVAL, serverInfo.get("check_interval").toString());
@@ -99,9 +102,10 @@ public class ServerMonitor extends Thread{
 		String mailBody = "";
 		ConnectionChecker currentConnection;
 		ArrayList<Bitacora> auxBitacoraList = new ArrayList<Bitacora>();
+		ArrayList<ConnectionStatus> connectionStatusTable = new ArrayList<ConnectionStatus>();
 		Timestamp date;
 		Timestamp sqlDate;
-		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS"); 
+		//SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS"); 
 		long diff = 0;
 		int availableRetryAttempts;
 		
@@ -120,6 +124,7 @@ public class ServerMonitor extends Thread{
 				while(itr.hasNext()){
 					currentConnection = itr.next();
 					System.out.println(currentConnection.getPort());
+					// se anota el tiempo del ultimo chequeo
 					data.put(ServerProperties.LAST_CHECK, (new Timestamp(new java.util.Date().getTime())).toString());
 					if(!currentConnection.Check()){//si la conexion con el puerto de esta iteracion falla
 						System.out.println(" -> check FALLIDO");
@@ -127,7 +132,7 @@ public class ServerMonitor extends Thread{
 						while(availableRetryAttempts > 0){//mientras no lleguemos al max_check_attempts
 							//sleep(retryInterval*60000);
 							System.out.println(" -> -> sleep de "+retryInterval+" mins");
-							
+							// se anota el tiempo del ultimo chequeo
 							data.put(ServerProperties.LAST_CHECK, (new Timestamp(new java.util.Date().getTime())).toString());
 							if(!currentConnection.Check()){//retry
 								System.out.println(" -> -> retry FALLIDO");
@@ -141,7 +146,12 @@ public class ServerMonitor extends Thread{
 						//si salimos sin utilizar el break significa que utilizamos todos los attempts
 						if(availableRetryAttempts == 0){
 							
+							// se anota la caida del servicio
 							connectionsOK = false;
+							connectionStatusTable = db.selectConnectionStatus(" port = '" + currentConnection.getPort() + "' ORDER BY date DESC LIMIT 1");
+							if( connectionStatusTable.isEmpty() || connectionStatusTable.get(0).getStatus() != down){
+								db.insertConnectionStatus(new ConnectionStatus(serverInfo.getProperty("address"), currentConnection.getPort(), down, new Timestamp(new java.util.Date().getTime()) ));
+							}
 							
 							//obtenemos la fecha actual
 							date = new Timestamp(new java.util.Date().getTime());
@@ -173,6 +183,7 @@ public class ServerMonitor extends Thread{
 								logger.error("Enviado Email de Error a" + targetMail);
 								System.out.println(" -------> MADAR MAIL");
 								//mail.sendEMail();
+								// se anota el tiempo de la ultima notificacion enviada
 								data.put(ServerProperties.LAST_NOTIF, (new Timestamp(new java.util.Date().getTime())).toString());
 							}else{//en este caso no importa si no llegamos al notification interval igual descontamos la tolerancia al siguiente fallo (poner el status como DOWN)
 								if(currentConnection.getAttemptsRemainig() > 1) currentConnection.setAttemptsRemainig(currentConnection.getAttemptsRemainig() - 1); 
@@ -183,11 +194,17 @@ public class ServerMonitor extends Thread{
 							currentConnection.setAttemptsRemainig(toleranceAttempts);
 						}
 					}else{//conexion con la iteracion actual es exitosa
+						// se anota que el estado del servicio es OK
+						connectionStatusTable = db.selectConnectionStatus(" port = '" + currentConnection.getPort() + "' ORDER BY date DESC LIMIT 1");
+						if( connectionStatusTable.isEmpty() || connectionStatusTable.get(0).getStatus() != ok){System.out.println("-----------");
+							db.insertConnectionStatus(new ConnectionStatus(serverInfo.getProperty("address"), currentConnection.getPort(), ok, new Timestamp(new java.util.Date().getTime()) ));
+						}else System.out.println("********");
 						System.out.println(" -> check EXITOSO");
 						logger.info("CheckCorrecto: " + currentConnection.toString());
 						currentConnection.setAttemptsRemainig(toleranceAttempts);
 					}
 				}
+				
 				if(connectionsOK){
 					data.put(ServerProperties.CURRENT_STATE, "OK");
 				}else{
