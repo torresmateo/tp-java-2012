@@ -7,6 +7,7 @@ import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Properties;
 
@@ -18,6 +19,13 @@ import gui.MainApp;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
+
+import utils.ServerProperties;
+
+// TODO 
+// borar todos los println 
+// descomentar los sleeps
+// borrar el sleep(0)
 
 public class ServerMonitor extends Thread{
 	
@@ -55,6 +63,21 @@ public class ServerMonitor extends Thread{
 		int notificationInterval = Integer.parseInt(serverInfo.get("notification_interval").toString());
 		int toleranceAttempts = Integer.parseInt(serverInfo.get("tolerance_attempts").toString());
 		
+		HashMap<ServerProperties, String> data = new HashMap<ServerProperties, String>();
+		
+		data.put(ServerProperties.ADDRESS, serverInfo.get("address").toString());
+    	data.put(ServerProperties.ALIAS, serverInfo.get("alias").toString());
+    	data.put(ServerProperties.CHECK_INTERVAL, serverInfo.get("check_interval").toString());
+    	data.put(ServerProperties.EMAIL_NOTIF, serverInfo.get("email_notification").toString());
+    	data.put(ServerProperties.HOSTNAME, serverInfo.get("host_name").toString());
+    	data.put(ServerProperties.MAX_CHECK_ATTEMPTS, serverInfo.get("max_check_attempts").toString());
+    	data.put(ServerProperties.NOTIF_INTERVAL, serverInfo.get("notification_interval").toString());
+    	data.put(ServerProperties.PORTS_LIST, serverInfo.get("ports_list").toString());
+    	data.put(ServerProperties.RETRY_INTERVAL, serverInfo.get("retry_interval").toString());
+    	data.put(ServerProperties.TOLERANCE_ATTEMPTS, serverInfo.get("tolerance_attempts").toString());  
+    	
+    	boolean connectionsOK;
+		
 		String targetMail = serverInfo.get("email_notification").toString();
 		String alias = serverInfo.get("alias").toString();
 		String address = serverInfo.get("address").toString();
@@ -81,17 +104,21 @@ public class ServerMonitor extends Thread{
 		//se utiliza la variable die para poder terminar la ejecucion del thread desde MainApp
 		while(!die){
 			try {
+				connectionsOK = true;
 				//iteramos la lista de conexiones, cada una de las cuales va a checkear un puerto en este servidor
 				itr = connList.iterator();
 				while(itr.hasNext()){
 					currentConnection = itr.next();
 					System.out.println(currentConnection.getPort());
+					data.put(ServerProperties.LAST_CHECK, (new Timestamp(new java.util.Date().getTime())).toString());
 					if(!currentConnection.Check()){//si la conexion con el puerto de esta iteracion falla
 						System.out.println(" -> check FALLIDO");
 						availableRetryAttempts = maxCheckAttempts;//reseteamos la cantidad de attempts disponibles con los que contamos
 						while(availableRetryAttempts > 0){//mientras no lleguemos al max_check_attempts
 							//sleep(retryInterval*60000);
 							System.out.println(" -> -> sleep de "+retryInterval+" mins");
+							
+							data.put(ServerProperties.LAST_CHECK, (new Timestamp(new java.util.Date().getTime())).toString());
 							if(!currentConnection.Check()){//retry
 								System.out.println(" -> -> retry FALLIDO");
 								availableRetryAttempts--;//contamos con un retry menos
@@ -103,10 +130,11 @@ public class ServerMonitor extends Thread{
 						}
 						//si salimos sin utilizar el break significa que utilizamos todos los attempts
 						if(availableRetryAttempts == 0){
+							
+							connectionsOK = false;
+							
 							//obtenemos la fecha actual
 							date = new Timestamp(new java.util.Date().getTime());
-							
-							
 							
 							//obtenemos la diferencia de tiempo entre la ultima notificacion enviada y el notification interval
 							auxBitacoraList = db.selectBitacoraObj(" email = '"+ targetMail +"' and alias = '" + alias + "' and puerto = " + currentConnection.getPort() + " order by marca_tiempo desc limit 1 offset 0");
@@ -116,7 +144,7 @@ public class ServerMonitor extends Thread{
 							}else{//en caso de que no se haya enviado antes una notificacion
 								diff = notificationInterval*60000;
 							}
-							
+
 							//si el tiempo que paso es mayor o igual al tiempo que se definio como notification interval 
 							//y ademas estamos la ultima instancia de tolerance_attempts enviamos el mail de alerta 
 							if(diff >= notificationInterval*60000 && currentConnection.getAttemptsRemainig() == 1){
@@ -135,7 +163,7 @@ public class ServerMonitor extends Thread{
 								logger.error("Enviado Email de Error a" + targetMail);
 								System.out.println(" -------> MADAR MAIL");
 								//mail.sendEMail();
-								//TODO actualizar el envio 
+								data.put(ServerProperties.LAST_NOTIF, (new Timestamp(new java.util.Date().getTime())).toString());
 							}else{//en este caso no importa si no llegamos al notification interval igual descontamos la tolerancia al siguiente fallo (poner el status como DOWN)
 								if(currentConnection.getAttemptsRemainig() > 1) currentConnection.setAttemptsRemainig(currentConnection.getAttemptsRemainig() - 1); 
 							}
@@ -143,22 +171,24 @@ public class ServerMonitor extends Thread{
 						}else{
 							logger.info("RetryCorrecto: " + currentConnection.toString());
 							currentConnection.setAttemptsRemainig(toleranceAttempts);
-							
-							//TODO ver el tema del status
 						}
 					}else{//conexion con la iteracion actual es exitosa
 						System.out.println(" -> check EXITOSO");
 						logger.info("CheckCorrecto: " + currentConnection.toString());
 						currentConnection.setAttemptsRemainig(toleranceAttempts);
-						
-						//TODO ver el tema del status
 					}
-					//TODO actualizar el archivo proerties con los nuevos last_check y variables parecidas para ver si es necesario poner en OK o mantener en DOWN
-					
 				}
+				if(connectionsOK){
+					data.put(ServerProperties.CURRENT_STATE, "OK");
+				}else{
+					data.put(ServerProperties.CURRENT_STATE, "DOWN");
+				}
+				//TODO hacer update del .properties
+				System.out.println("==> CURRENT_STATE="+data.get(ServerProperties.CURRENT_STATE));
 				//sleep(checkInterval*60000);//esperamos la cantidad configurada de tiempo para volver a hacer el check
 				sleep(0);
 				System.out.println("sleep de "+checkInterval+" mins");
+				System.out.println();
 			} catch (InterruptedException e) {
 				System.err.println("Error en el ServerMonitor");
 				e.printStackTrace();
