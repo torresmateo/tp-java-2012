@@ -231,7 +231,7 @@ public class DBInterface {
 			returnArray.add(new ConnectionStatus(
 					rs.getString("address"), 
 					rs.getInt("port"), 
-					rs.getString("satus"), 
+					rs.getInt("satus"), 
 					rs.getTimestamp("date") ));
 		}
 		return returnArray;
@@ -246,7 +246,7 @@ public class DBInterface {
 			returnArray.add(new ConnectionStatus(
 					rs.getString("address"), 
 					rs.getInt("port"), 
-					rs.getString("satus"), 
+					rs.getInt("status"), 
 					rs.getTimestamp("date") ));
 		}
 		return returnArray;
@@ -257,7 +257,7 @@ public class DBInterface {
 		PreparedStatement pstmt = conn.prepareStatement(sql);
 		pstmt.setString(1, newEntry.getAddress());
 		pstmt.setInt(2, newEntry.getPort());
-		pstmt.setString(3, newEntry.getStatus());
+		pstmt.setInt(3, newEntry.getStatus());
 		pstmt.setTimestamp(4, newEntry.getDate());
 		pstmt.executeUpdate();
 	}

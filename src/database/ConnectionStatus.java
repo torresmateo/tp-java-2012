@@ -7,16 +7,24 @@ public class ConnectionStatus {
 	private int id;
 	private String address;
 	private int port;
-	private String status;
+	private int status;
 	private Timestamp date;
 	
-	public ConnectionStatus(String address, int port, String status,
+	public ConnectionStatus(String address, int port, int status,
 			Timestamp date) {
 		super();
 		this.address = address;
 		this.port = port;
 		this.status = status;
 		this.date = date;
+	}
+	
+	public ConnectionStatus(String address, int port, int status) {
+		super();
+		this.address = address;
+		this.port = port;
+		this.status = status;
+		this.date = null;
 	}
 	
 	public int getId() {
@@ -37,10 +45,10 @@ public class ConnectionStatus {
 	public void setPort(int port) {
 		this.port = port;
 	}
-	public String getStatus() {
+	public int getStatus() {
 		return status;
 	}
-	public void setStatus(String status) {
+	public void setStatus(int status) {
 		this.status = status;
 	}
 	public Timestamp getDate() {
