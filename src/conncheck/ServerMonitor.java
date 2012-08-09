@@ -26,6 +26,7 @@ import utils.ServerProperties;
 // borar todos los println 
 // descomentar los sleeps
 // borrar el sleep(0)
+// descomentar el mail.sendEMail()
 
 public class ServerMonitor extends Thread{
 	
@@ -35,7 +36,7 @@ public class ServerMonitor extends Thread{
 	MainApp father;
 	
 	private static final int down = 0;
-	private static final int ok = 0;
+	private static final int ok = 1;
 	
 	public void setDie(boolean die) {
 		this.die = die;
@@ -75,7 +76,7 @@ public class ServerMonitor extends Thread{
 		// hash para anotar los nuevos valores en el .properties
 		HashMap<ServerProperties, String> data = new HashMap<ServerProperties, String>();
 		
-		// Se asignan los valores que nunca cambian
+		// Se asignan los valores iniciales al data
 		data.put(ServerProperties.ADDRESS, serverInfo.get("address").toString());
     	data.put(ServerProperties.ALIAS, serverInfo.get("alias").toString());
     	data.put(ServerProperties.CHECK_INTERVAL, serverInfo.get("check_interval").toString());
@@ -148,7 +149,7 @@ public class ServerMonitor extends Thread{
 							
 							// se anota la caida del servicio
 							connectionsOK = false;
-							connectionStatusTable = db.selectConnectionStatus(" port = '" + currentConnection.getPort() + "' ORDER BY date DESC LIMIT 1");
+							connectionStatusTable = db.selectConnectionStatus(" address = '" + address + "' AND  port = '" + currentConnection.getPort() + "' ORDER BY date DESC LIMIT 1");
 							if( connectionStatusTable.isEmpty() || connectionStatusTable.get(0).getStatus() != down){
 								db.insertConnectionStatus(new ConnectionStatus(serverInfo.getProperty("address"), currentConnection.getPort(), down, new Timestamp(new java.util.Date().getTime()) ));
 							}
@@ -195,10 +196,10 @@ public class ServerMonitor extends Thread{
 						}
 					}else{//conexion con la iteracion actual es exitosa
 						// se anota que el estado del servicio es OK
-						connectionStatusTable = db.selectConnectionStatus(" port = '" + currentConnection.getPort() + "' ORDER BY date DESC LIMIT 1");
-						if( connectionStatusTable.isEmpty() || connectionStatusTable.get(0).getStatus() != ok){System.out.println("-----------");
+						connectionStatusTable = db.selectConnectionStatus(" address = '" + address + "' AND port = '" + currentConnection.getPort() + "' ORDER BY date DESC LIMIT 1");
+						if( connectionStatusTable.isEmpty() || connectionStatusTable.get(0).getStatus() != ok){
 							db.insertConnectionStatus(new ConnectionStatus(serverInfo.getProperty("address"), currentConnection.getPort(), ok, new Timestamp(new java.util.Date().getTime()) ));
-						}else System.out.println("********");
+						}
 						System.out.println(" -> check EXITOSO");
 						logger.info("CheckCorrecto: " + currentConnection.toString());
 						currentConnection.setAttemptsRemainig(toleranceAttempts);
@@ -210,7 +211,6 @@ public class ServerMonitor extends Thread{
 				}else{
 					data.put(ServerProperties.CURRENT_STATE, "DOWN");
 				}
-				//TODO hacer update del .properties
 				FileManager.update(data.get(ServerProperties.ALIAS)+".properties",data);
 				father.refreshTreeModel();
 				System.out.println("==> CURRENT_STATE="+data.get(ServerProperties.CURRENT_STATE));
