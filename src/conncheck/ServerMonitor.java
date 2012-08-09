@@ -131,7 +131,7 @@ public class ServerMonitor extends Thread{
 						System.out.println(" -> check FALLIDO");
 						availableRetryAttempts = maxCheckAttempts;//reseteamos la cantidad de attempts disponibles con los que contamos
 						while(availableRetryAttempts > 0){//mientras no lleguemos al max_check_attempts
-							//sleep(retryInterval*60000);
+							sleep(retryInterval*60000);
 							System.out.println(" -> -> sleep de "+retryInterval+" mins");
 							// se anota el tiempo del ultimo chequeo
 							data.put(ServerProperties.LAST_CHECK, (new Timestamp(new java.util.Date().getTime())).toString());
@@ -215,8 +215,8 @@ public class ServerMonitor extends Thread{
 				father.readServerFilesWithoutServerMonitorCall();
 				father.refreshTreeModel();
 				System.out.println("==> CURRENT_STATE="+data.get(ServerProperties.CURRENT_STATE));
-				//sleep(checkInterval*60000);//esperamos la cantidad configurada de tiempo para volver a hacer el check
-				sleep(0);
+				sleep(checkInterval*60000);//esperamos la cantidad configurada de tiempo para volver a hacer el check
+				//sleep(0);
 				System.out.println("sleep de "+checkInterval+" mins");
 				System.out.println();
 			} catch (InterruptedException e) {
