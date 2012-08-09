@@ -18,6 +18,8 @@ import gui.MainApp;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
+import parser.FileManager;
+
 import utils.ServerProperties;
 
 // TODO 
@@ -30,6 +32,7 @@ public class ServerMonitor extends Thread{
 	private Properties serverInfo;
 	static Logger logger = Logger.getLogger(ServerMonitor.class);
 	private boolean die = false;
+	MainApp father;
 	
 	private static final int down = 0;
 	private static final int ok = 0;
@@ -38,8 +41,13 @@ public class ServerMonitor extends Thread{
 		this.die = die;
 	}
 
-	public ServerMonitor(Properties serverInfo){
+	public Properties getServerInfo() {
+		return serverInfo;
+	}
+
+	public ServerMonitor(Properties serverInfo, MainApp father){
 		this.serverInfo = serverInfo;
+		this.father = father;
 	}
 	
 	public void run(){
@@ -78,7 +86,9 @@ public class ServerMonitor extends Thread{
     	data.put(ServerProperties.PORTS_LIST, serverInfo.get("ports_list").toString());
     	data.put(ServerProperties.RETRY_INTERVAL, serverInfo.get("retry_interval").toString());
     	data.put(ServerProperties.TOLERANCE_ATTEMPTS, serverInfo.get("tolerance_attempts").toString());  
-    	
+    	data.put(ServerProperties.LAST_CHECK, serverInfo.get("last_check").toString());  
+    	data.put(ServerProperties.LAST_NOTIF, serverInfo.get("last_notification").toString());  
+    	data.put(ServerProperties.CURRENT_STATE, serverInfo.get("current_state").toString());  
     	boolean connectionsOK;
 		
 		String targetMail = serverInfo.get("email_notification").toString();
@@ -201,6 +211,8 @@ public class ServerMonitor extends Thread{
 					data.put(ServerProperties.CURRENT_STATE, "DOWN");
 				}
 				//TODO hacer update del .properties
+				FileManager.update(data.get(ServerProperties.ALIAS)+".properties",data);
+				father.refreshTreeModel();
 				System.out.println("==> CURRENT_STATE="+data.get(ServerProperties.CURRENT_STATE));
 				//sleep(checkInterval*60000);//esperamos la cantidad configurada de tiempo para volver a hacer el check
 				sleep(0);
@@ -223,6 +235,11 @@ public class ServerMonitor extends Thread{
 			returnArray.add(new ConnectionChecker(address, Integer.parseInt(strList[i])));
 		}
 		return returnArray;
+	}
+
+	@Override
+	public String toString() {
+		return "ServerMonitor [serverInfo=" + serverInfo + ", die=" + die + "]";
 	}
 	
 
