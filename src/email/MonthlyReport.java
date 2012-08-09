@@ -103,7 +103,21 @@ public class MonthlyReport extends Thread{
 			}
 			
 			if( mailSent ){
-				//TODO update del la variable de sistema
+				try{
+					nextReportDateString = ((db.selectSysVarObjByName("NEXT_REPORT_DATE")).get(0)).getValue();
+					nextReportDate = new Timestamp(dateFormat.parse(nextReportDateString).getTime());
+					today = new Timestamp(new java.util.Date().getTime());
+					
+					while( nextReportDate.getTime() < today.getTime() ){
+						//TODO
+					}
+					
+					db.updateSysVar("NEXT_REPORT_DATE", nextReportDate.toString());
+				} catch (SQLException e) {
+					logger.error("Error SQL: " + e.getMessage() + e.getStackTrace());
+				} catch (ParseException e) {
+					e.printStackTrace();
+				}
 			}
 			
 			try {

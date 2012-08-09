@@ -205,6 +205,12 @@ public class DBInterface {
 		pstmt.executeUpdate();
 	}
 	
+	public void updateSysVar(String name, String value) throws SQLException{
+		String sql = "update sys_vars set value = '" + value + "' where name = '" + name + "' ";
+		Statement stmt = conn.createStatement();
+		stmt.executeUpdate(sql);
+	}
+	
 	public ResultSet selectSysVar(String where) throws SQLException{
 		String sql = "select * from sys_vars where " + where;
 		Statement stmt = conn.createStatement();
