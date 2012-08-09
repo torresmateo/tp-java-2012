@@ -8,6 +8,7 @@ import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Iterator;
 import java.util.Properties;
 
@@ -22,6 +23,7 @@ import database.DBInterface;
 import database.SysVar;
 
 public class MonthlyReport extends Thread{
+	
 	
 	static Logger logger = Logger.getLogger(ServerMonitor.class);
 	
@@ -96,6 +98,8 @@ public class MonthlyReport extends Thread{
 	}
 	
 	public void run(){
+		Calendar cal = Calendar.getInstance();
+		
 		ServerMonitor currentServer;
 		String nextReportDateString;
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
@@ -151,10 +155,12 @@ public class MonthlyReport extends Thread{
 					nextReportDateString = ((db.selectSysVarObjByName("NEXT_REPORT_DATE")).get(0)).getValue();
 					nextReportDate = new Timestamp(dateFormat.parse(nextReportDateString).getTime());
 					today = new Timestamp(new java.util.Date().getTime());
+					cal.setTimeInMillis(today.getTime());
+					int month = cal.get(Calendar.MONTH);//mes actual
+					int year = cal.get(Calendar.YEAR);//a–o actual
+					cal.set(year, month + 1, 1);
 					
-					while( nextReportDate.getTime() < today.getTime() ){
-						//TODO
-					}
+					nextReportDate.setTime(cal.getTimeInMillis());
 					
 					db.updateSysVar("NEXT_REPORT_DATE", nextReportDate.toString());
 				} catch (SQLException e) {
