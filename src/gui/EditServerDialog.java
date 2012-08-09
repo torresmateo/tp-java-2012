@@ -85,6 +85,7 @@ public class EditServerDialog extends ServerDialog{
             	data.put(ServerProperties.PORTS_LIST,tfportslist.getText());
             	data.put(ServerProperties.RETRY_INTERVAL,tfretryint.getText());
             	data.put(ServerProperties.TOLERANCE_ATTEMPTS,tftolerance.getText());            	
+            	System.out.println("update desde el dialog");
             	if(FileManager.update(father.getLastSelectedServerName(),data)){
 	            	JOptionPane.showMessageDialog(basic, "It has been updated successfully!",
 	                        "Information", JOptionPane.INFORMATION_MESSAGE);

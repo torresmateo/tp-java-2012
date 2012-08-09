@@ -17,6 +17,7 @@ import org.apache.log4j.Logger;
 import conncheck.ServerMonitor;
 import database.Conector;
 import database.DBInterface;
+import database.SysVar;
 
 public class MonthlyReport extends Thread{
 	
@@ -67,6 +68,7 @@ public class MonthlyReport extends Thread{
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 		Timestamp today;
 		Timestamp nextReportDate;
+		ArrayList<SysVar> sysVarList = new ArrayList<SysVar>();
 		boolean mailSent = false;
 		
 		
@@ -81,6 +83,15 @@ public class MonthlyReport extends Thread{
 		DBInterface db = null;
 		if(conPostgres != null)
 			db = new DBInterface(conPostgres);
+		
+		try {
+			sysVarList = db.selectSysVarObjByName("NEXT_REPORT_DATE");
+			if(sysVarList.isEmpty()){
+				db.insertSysVarObj(new SysVar("NEXT_REPORT_DATE", dateFormat.format(new java.util.Date())));
+			}
+		} catch (SQLException e1) {
+			logger.error("Error SQL: " + e1.getMessage() + e1.getStackTrace());
+		}
 		
 		while(!die){
 			Iterator<ServerMonitor> itr = serverList.iterator();
@@ -98,7 +109,7 @@ public class MonthlyReport extends Thread{
 				} catch (SQLException e) {
 					logger.error("Error SQL: " + e.getMessage() + e.getStackTrace());
 				} catch (ParseException e) {
-					e.printStackTrace();
+					logger.error("Parser Error: " + e.getMessage() + e.getStackTrace());
 				}
 			}
 			
@@ -123,7 +134,7 @@ public class MonthlyReport extends Thread{
 			try {
 				sleep(60*60000);//dormir una hora
 			} catch (InterruptedException e) {
-				e.printStackTrace();
+				logger.error("Interrupted Error: " + e.getMessage() + e.getStackTrace());
 			}
 		}
 	}
