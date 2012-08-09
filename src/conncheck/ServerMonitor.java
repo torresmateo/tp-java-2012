@@ -29,6 +29,8 @@ public class ServerMonitor extends Thread{
 	}
 	
 	public void run(){
+		PropertyConfigurator.configure("src/log4j.properties");//cargamos la configuracion del logger
+		
 		Connection conPostgres = null;
 		try{
 			conPostgres = Conector.connectByFile(MainApp.POSTGRES_PROPERTIES_PATH);
@@ -41,7 +43,6 @@ public class ServerMonitor extends Thread{
 		if(conPostgres != null)
 			db = new DBInterface(conPostgres);
 		
-		
 		Iterator<ConnectionChecker>  itr;
 		int checkInterval = Integer.parseInt(serverInfo.get("check_interval").toString());
 		int retryInterval = Integer.parseInt(serverInfo.get("retry_interval").toString());
@@ -49,7 +50,6 @@ public class ServerMonitor extends Thread{
 		int notificationInterval = Integer.parseInt(serverInfo.get("notification_interval").toString());
 		int toleranceAttempts = Integer.parseInt(serverInfo.get("tolerance_attempts").toString());
 		int toleranceAttemptsOriginalValue = toleranceAttempts;
-		PropertyConfigurator.configure("src/log4j.properties");
 		
 		String targetMail = serverInfo.get("email_notification").toString();
 		String alias = serverInfo.get("alias").toString();
@@ -58,7 +58,6 @@ public class ServerMonitor extends Thread{
 		
 		MonitorEMail mail = new MonitorEMail();
 		mail.addRecipient(targetMail);
-		mail.addRecipient("minardifer@gmail.com");//te va a llegar el spam de la vida :)
 		
 		String mailBody = "";
 		ConnectionChecker currentConnection;
