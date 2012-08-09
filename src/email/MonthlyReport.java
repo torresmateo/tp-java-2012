@@ -1,13 +1,26 @@
 package email;
 
+import gui.MainApp;
+
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Properties;
 
+import org.apache.log4j.Logger;
+
+
 import conncheck.ServerMonitor;
+import database.Conector;
+import database.DBInterface;
 
 public class MonthlyReport extends Thread{
 	
+	static Logger logger = Logger.getLogger(ServerMonitor.class);
 	
 	private ArrayList<ServerMonitor> serverList;
 	private boolean die = false;
@@ -47,19 +60,55 @@ public class MonthlyReport extends Thread{
 		mail.setBody(mailBody);
 		mail.sendEMail();
 	}
+	
 	public void run(){
 		ServerMonitor currentServer;
+		String nextReportDateString;
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+		Timestamp today;
+		Timestamp nextReportDate;
+		boolean mailSent = false;
+		
+		
+		Connection conPostgres = null;
+		try{
+			conPostgres = Conector.connectByFile(MainApp.POSTGRES_PROPERTIES_PATH);
+		} catch (ClassNotFoundException e) {
+			logger.error("No se encontro el driver");
+		} catch (SQLException e) {
+			logger.error("Error SQL: " + e.getMessage() + e.getStackTrace());
+		}
+		DBInterface db = null;
+		if(conPostgres != null)
+			db = new DBInterface(conPostgres);
+		
 		while(!die){
 			Iterator<ServerMonitor> itr = serverList.iterator();
 			while(itr.hasNext()){
 				currentServer = itr.next();
-				if(true)//si ya paso la fecha en que hay que mandar el mail
-					this.sendMonthlyEmail(currentServer);
+				try{
+					nextReportDateString = ((db.selectSysVarObjByName("NEXT_REPORT_DATE")).get(0)).getValue();
+					nextReportDate = new Timestamp(dateFormat.parse(nextReportDateString).getTime());
+					today = new Timestamp(new java.util.Date().getTime());
+					
+					if( nextReportDate.getTime() < today.getTime() ){//si ya paso la fecha en que hay que mandar el mail
+						this.sendMonthlyEmail(currentServer);
+						mailSent = true;
+					}
+				} catch (SQLException e) {
+					logger.error("Error SQL: " + e.getMessage() + e.getStackTrace());
+				} catch (ParseException e) {
+					e.printStackTrace();
+				}
 			}
+			
+			if( mailSent ){
+				//TODO update del la variable de sistema
+			}
+			
 			try {
 				sleep(60*60000);//dormir una hora
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
