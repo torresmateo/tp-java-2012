@@ -17,6 +17,7 @@ import org.apache.log4j.Logger;
 
 import conncheck.ServerMonitor;
 import database.Conector;
+import database.ConnectionStatus;
 import database.DBInterface;
 import database.SysVar;
 
@@ -49,6 +50,50 @@ public class MonthlyReport extends Thread{
 		this.die = die;
 	}
 
+	String generateUptimeStatistics(ArrayList<ConnectionStatus> csList){
+		ConnectionStatus currentCS;
+		Timestamp initialTime = null;
+		Timestamp lastTime = null;
+		String address = "";
+		int port = 0;
+		boolean setInfo = true;
+		boolean setInitial = true;
+		boolean setLastTime = true;
+		long upTime = 0;
+		long totalTime = 0;
+		Iterator<ConnectionStatus> itr = csList.iterator();
+		while(itr.hasNext()){
+			currentCS = itr.next();
+			
+			if(currentCS.getStatus() == 0){//si el estado es caido, sumamos el tiempo transcurrido 
+				if(setLastTime){
+					setLastTime = false;
+					lastTime = currentCS.getDate();
+				}
+				upTime += currentCS.getDate().getTime() - lastTime.getTime();
+			}else{
+				if(setInitial){//anotamos la primera fecha en la que la conexion estuvo up
+					setInitial = false;
+					initialTime = currentCS.getDate();
+				}
+			}
+			lastTime = currentCS.getDate();
+			if(setInfo){
+				setInfo = false;
+				address = currentCS.getAddress();
+				port = currentCS.getPort();
+			}
+		}
+		totalTime = lastTime.getTime() - initialTime.getTime();
+		Calendar cal = Calendar.getInstance();
+		cal.setTimeInMillis(initialTime.getTime());
+		java.util.Date initialDate = cal.getTime();
+		cal.setTimeInMillis(lastTime.getTime());
+		java.util.Date finalDate = cal.getTime();
+		
+		return "El servicio con direccion " + address + " y puerto " + port + "estuvo activo el " + (upTime/totalTime)*100 + "% del tiempo entre " + initialDate + " y " + finalDate;
+	}
+	
 	String generateStatistics(Properties serverInfo){
 		return "cada un anho explota la nutria!!";
 	}
