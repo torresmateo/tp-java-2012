@@ -3,6 +3,8 @@ package conncheck;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -116,6 +118,41 @@ public class ServerMonitor extends Thread{
 			currentConnection.setAttemptsRemainig(toleranceAttempts);
 		}
 		
+		//control de last_check despues de iniciar App
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+		Timestamp today;
+		Timestamp last_check;
+		Timestamp last_check_int;
+		long check_int_ms=checkInterval*60*1000;
+		try {
+			
+			last_check = new Timestamp(dateFormat.parse(data.get(ServerProperties.LAST_CHECK)).getTime());
+			//al last_check se suma el check interval para el control
+			last_check_int = new Timestamp(last_check.getTime()+check_int_ms);
+			today = new Timestamp(new java.util.Date().getTime());
+			if(today.getTime() > last_check_int.getTime()){ //si el tiempo actual es mayor al last_check mas el check interval
+				long diff1=today.getTime() - last_check.getTime();
+				int hour = (int) ((diff1 / 1000) / 3600);
+				int minutes = (int) (((diff1 / 1000) / 60) % 60);
+				int seconds = (int) ((diff1 / 1000) % 60);
+				java.sql.Date fecha = new java.sql.Date(last_check.getTime());
+				java.sql.Time hora = new java.sql.Time(last_check.getTime());
+				mail.setSubject("Alerta del Sistema de Monitoreo de Conecciones");
+				mailBody = "El servicio de monitoreo estuvo apagado. El último chequeo para la " +
+						"configuración: \n";
+				mailBody += "alias = " + alias + "\n";
+				mailBody += "address = " + address + "\n";
+				mailBody += "check interval = " + checkInterval + " minutos\n";
+				mailBody += "fue realizado en fecha "+fecha+" y hora "+hora+".\n";
+				mailBody += "Existe una diferencia de " + hour+":"+minutes+":"+seconds;
+				mailBody += " con relación al último chequeo.\n";
+				mail.setBody(mailBody);
+				mail.sendEMail();
+			}
+		} catch (ParseException e1) {
+			logger.error("Last check date format invalid to server: "+data.get(ServerProperties.ALIAS));
+		}
+		
 		//se utiliza la variable die para poder terminar la ejecucion del thread desde MainApp
 		while(!die){
 			try {
@@ -173,7 +210,7 @@ public class ServerMonitor extends Thread{
 								currentConnection.setAttemptsRemainig(toleranceAttempts);
 								//se prepara el mensaje de la alerta
 								mail.setSubject("Alerta del Sistema de Monitoreo de Conecciones");
-								mailBody = "Fallo la coneccion con la siguiente configuracion:\n";
+								mailBody = "Fallo la conexion con la siguiente configuracion:\n";
 								mailBody += "alias = " + alias + "\n";
 								mailBody += "address = " + address + "\n";
 								mailBody += "port = " + currentConnection.getPort() + "\n";
