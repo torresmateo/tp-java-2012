@@ -183,7 +183,7 @@ public class ServerMonitor extends Thread{
 								db.insertBitacoraObj(new Bitacora(serverInfo.get("alias").toString(), currentConnection.getHost(), currentConnection.getPort(), targetMail, "DOWN",""));
 								logger.error("Enviado Email de Error a" + targetMail);
 								System.out.println(" -------> MADAR MAIL");
-								//mail.sendEMail();
+								mail.sendEMail();
 								// se anota el tiempo de la ultima notificacion enviada
 								data.put(ServerProperties.LAST_NOTIF, (new Timestamp(new java.util.Date().getTime())).toString());
 							}else{//en este caso no importa si no llegamos al notification interval igual descontamos la tolerancia al siguiente fallo (poner el status como DOWN)
@@ -217,7 +217,6 @@ public class ServerMonitor extends Thread{
 				father.refreshTreeModel();
 				System.out.println("==> CURRENT_STATE="+data.get(ServerProperties.CURRENT_STATE));
 				sleep(checkInterval*60000);//esperamos la cantidad configurada de tiempo para volver a hacer el check
-				//sleep(0);
 				System.out.println("sleep de "+checkInterval+" mins");
 				System.out.println();
 			} catch (InterruptedException e) {

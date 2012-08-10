@@ -100,7 +100,7 @@ public class MainApp extends JFrame {
 		DIR_PATH = dirPath;
 	}
 	public MainApp() {
-		mReport.start();
+	//	mReport.start();
 		ConfigDialog = new DefaultConfigDialog(this);
 		ImageIcon configIcon = new ImageIcon(getClass().getResource("config.png"));
 		configButton = new JButton(configIcon);
