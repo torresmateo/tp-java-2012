@@ -178,13 +178,12 @@ public class MonthlyReport extends Thread{
 	}
 	
 	void sendMonthlyEmail(ServerMonitor currentServer){
-		String mailBody;System.out.println("\n\n<<< ????? >>>\n\n");
+		String mailBody;
 		Properties serverInfo = currentServer.getServerInfo();
 		MonitorEMail mail = new MonitorEMail();
 		mail.addRecipient(serverInfo.getProperty("email_notification"));
 		mail.setSubject("Alerta MENSUAL del Sistema de Monitoreo de Conecciones");
 		mailBody = generateStatistics(serverInfo);
-		System.out.println(mailBody);
 		mail.setBody(mailBody);
 		mail.sendEMail();
 	}
@@ -226,7 +225,7 @@ public class MonthlyReport extends Thread{
 		while(!die){
 			// se itera por cada servidor
 			Iterator<ServerMonitor> itr = serverList.iterator();
-			while(itr.hasNext()){System.out.println("YYEEEESSS");
+			while(itr.hasNext()){
 				currentServer = itr.next();
 				try{
 					// se extraen las fechas de hoy y la fecha NEXT_REPORT_DATE
