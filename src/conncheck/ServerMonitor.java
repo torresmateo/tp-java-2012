@@ -161,23 +161,23 @@ public class ServerMonitor extends Thread{
 				itr = connList.iterator();
 				while(itr.hasNext()){
 					currentConnection = itr.next();
-					System.out.println(currentConnection.getPort());
+					//system.out.println(currentConnection.getPort());
 					// se anota el tiempo del ultimo chequeo
 					data.put(ServerProperties.LAST_CHECK, (new Timestamp(new java.util.Date().getTime())).toString());
 					if(!currentConnection.Check()){//si la conexion con el puerto de esta iteracion falla
-						System.out.println(" -> check FALLIDO");
+						//system.out.println(" -> check FALLIDO");
 						availableRetryAttempts = maxCheckAttempts;//reseteamos la cantidad de attempts disponibles con los que contamos
 						while(availableRetryAttempts > 0){//mientras no lleguemos al max_check_attempts
 							sleep(retryInterval*60000);
-							System.out.println(" -> -> sleep de "+retryInterval+" mins");
+							//system.out.println(" -> -> sleep de "+retryInterval+" mins");
 							// se anota el tiempo del ultimo chequeo
 							data.put(ServerProperties.LAST_CHECK, (new Timestamp(new java.util.Date().getTime())).toString());
 							if(!currentConnection.Check()){//retry
-								System.out.println(" -> -> retry FALLIDO");
+								//system.out.println(" -> -> retry FALLIDO");
 								availableRetryAttempts--;//contamos con un retry menos
 								logger.error("Retry de la coneccion" + currentConnection);
 							}else{
-								System.out.println(" -> -> retry EXITOSO");
+								//system.out.println(" -> -> retry EXITOSO");
 								break;//salimos del while
 							}
 						}
@@ -219,7 +219,7 @@ public class ServerMonitor extends Thread{
 								//insertamos a la base de datos la alerta a enviar
 								db.insertBitacoraObj(new Bitacora(serverInfo.get("alias").toString(), currentConnection.getHost(), currentConnection.getPort(), targetMail, "DOWN",""));
 								logger.error("Enviado Email de Error a" + targetMail);
-								System.out.println(" -------> MADAR MAIL");
+								//system.out.println(" -------> MADAR MAIL");
 								mail.sendEMail();
 								// se anota el tiempo de la ultima notificacion enviada
 								data.put(ServerProperties.LAST_NOTIF, (new Timestamp(new java.util.Date().getTime())).toString());
@@ -237,7 +237,7 @@ public class ServerMonitor extends Thread{
 						if( connectionStatusTable.isEmpty() || connectionStatusTable.get(0).getStatus() != ok){
 							db.insertConnectionStatus(new ConnectionStatus(serverInfo.getProperty("address"), currentConnection.getPort(), ok, new Timestamp(new java.util.Date().getTime()) ));
 						}
-						System.out.println(" -> check EXITOSO");
+						//system.out.println(" -> check EXITOSO");
 						logger.info("CheckCorrecto: " + currentConnection.toString());
 						currentConnection.setAttemptsRemainig(toleranceAttempts);
 					}
@@ -248,14 +248,14 @@ public class ServerMonitor extends Thread{
 				}else{
 					data.put(ServerProperties.CURRENT_STATE, "DOWN");
 				}
-				System.out.println("update desde el thread");
+				//system.out.println("update desde el thread");
 				FileManager.update(data.get(ServerProperties.ALIAS)+".properties",data);
 				father.readServerFilesWithoutServerMonitorCall();
 				father.refreshTreeModel();
-				System.out.println("==> CURRENT_STATE="+data.get(ServerProperties.CURRENT_STATE));
+				//system.out.println("==> CURRENT_STATE="+data.get(ServerProperties.CURRENT_STATE));
 				sleep(checkInterval*60000);//esperamos la cantidad configurada de tiempo para volver a hacer el check
-				System.out.println("sleep de "+checkInterval+" mins");
-				System.out.println();
+				//system.out.println("sleep de "+checkInterval+" mins");
+				//system.out.println();
 			} catch (InterruptedException e) {
 				System.err.println("Error en el ServerMonitor");
 				e.printStackTrace();
